@@ -5,10 +5,19 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import mino.Block;
 
 import mino.Mino;
+import mino.Mino_Bar;
 import mino.Mino_L1;
+import mino.Mino_L2;
+import mino.Mino_Square;
+import mino.Mino_T;
+import mino.Mino_Z1;
+import mino.Mino_Z2;
 
 public class PlayManager {
 
@@ -22,6 +31,10 @@ public class PlayManager {
     Mino currentMino;
     final int MINO_START_X;
     final int MINO_START_Y;
+    Mino nextMino;
+    final int NEXTMINO_X;
+    final int NEXTMINO_Y;
+    public static ArrayList<Block> staticBlocks =  new ArrayList<>();
 
     public static int dropInterval = 60;
 
@@ -34,12 +47,46 @@ public class PlayManager {
         MINO_START_X = left_x + (WIDTH/2) - Block.SIZE;
         MINO_START_Y = top_y + Block.SIZE;
 
-        currentMino = new Mino_L1();
+        NEXTMINO_X = right_x + 175;
+        NEXTMINO_Y = top_y + 500;
+
+        currentMino = pickMino();
         currentMino.setXY(MINO_START_X, MINO_START_Y);
+        nextMino = pickMino();
+        nextMino.setXY(NEXTMINO_X, NEXTMINO_Y);
+    }
+
+    private Mino pickMino() {
+        Mino mino = null;
+        int i = new Random().nextInt(7);
+
+        switch(i) {
+            case 0 -> mino = new Mino_L1();
+            case 1 -> mino = new Mino_L2();
+            case 2 -> mino = new Mino_Square();
+            case 3 -> mino = new Mino_Bar();
+            case 4 -> mino = new Mino_T();
+            case 5 -> mino = new Mino_Z1();
+            case 6 -> mino = new Mino_Z2();
+        }
+        return mino;
     }
 
     public void update() {
-        currentMino.update();
+        if (currentMino.active == false) {
+            staticBlocks.add(currentMino.b[0]);
+            staticBlocks.add(currentMino.b[1]);
+            staticBlocks.add(currentMino.b[2]);
+            staticBlocks.add(currentMino.b[3]);
+
+            currentMino = nextMino;
+            currentMino.setXY(MINO_START_X, MINO_START_Y);
+            nextMino = pickMino();
+            nextMino.setXY(NEXTMINO_X, NEXTMINO_Y);
+        }
+        else {
+            currentMino.update();
+        }
     }
 
     public void draw(Graphics2D g2) {
@@ -56,6 +103,20 @@ public class PlayManager {
 
         if (currentMino != null) {
             currentMino.draw(g2);
+        }
+
+        nextMino.draw(g2);
+
+        for (int i = 0; i < staticBlocks.size(); i++) {
+            staticBlocks.get(i).draw(g2);
+        }
+
+        g2.setColor(Color.yellow);
+        g2.setFont(g2.getFont().deriveFont(50f));
+        if (KeyHandler.pausePressed) {
+            x = left_x + 70;
+            y = top_y + 320;
+            g2.drawString("PAUSED", x, y);
         }
     }
 }
