@@ -2,6 +2,11 @@ package mino;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyHandler;
@@ -12,10 +17,14 @@ public class CharModel {
     public Block tempB[] = new Block[4];
     public int direction = 1;
     boolean topCollision, leftCollision, rightCollision, bottomCollision;
+    public BufferedImage model;
+    public int x, y = 100;
 
     public CharModel(Color c) {
         b[0] = new Block(c);
         tempB[0] = new Block(c);
+
+        getCharModel();
     }
 
     public void create(Color c) {
@@ -34,6 +43,16 @@ public class CharModel {
             this.direction = direction;
             b[0].x = tempB[0].x;
             b[0].y = tempB[0].y;
+        }
+    }
+
+    public void getCharModel() {
+        try {
+            model = ImageIO.read(getClass().getResourceAsStream("/knight.png"));
+        } 
+
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -135,9 +154,14 @@ public class CharModel {
     }
 
     public void draw(Graphics2D g2) {
-        int margin = 2;
-        g2.setColor(b[0].c);
-        g2.fillRect(b[0].x+margin, b[0].y+margin, Block.SIZE-(margin*2), Block.SIZE-(margin*2));
+        //int margin = 2;
+        //g2.setColor(b[0].c);
+        //g2.fillRect(b[0].x+margin, b[0].y+margin, Block.SIZE-(margin*2), Block.SIZE-(margin*2));
+
+        int margin = 6;
+        BufferedImage image = model;
+        g2.drawImage(image, b[0].x-margin*2, b[0].y-margin, 48, 48, null);
+
     }
     
 }
