@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Random;
 import mino.Block;
-import mino.CharModel;
 import mino.Mino;
 import mino.Mino_Bar;
 import mino.Mino_L1;
@@ -17,6 +16,7 @@ import mino.Mino_Square;
 import mino.Mino_T;
 import mino.Mino_Z1;
 import mino.Mino_Z2;
+import mino.entities.CharModel;
 
 public class PlayManager {
 
@@ -27,7 +27,7 @@ public class PlayManager {
     public static int top_y;
     public static int bottom_y;
 
-    Mino currentMino;
+    public static Mino currentMino;
     final int MINO_START_X;
     final int MINO_START_Y;
     Mino nextMino;
