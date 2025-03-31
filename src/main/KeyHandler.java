@@ -45,9 +45,6 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_A) {
             aPressed = true;
         }
-        if (code == KeyEvent.VK_S) {
-            sPressed = true;
-        }
         if (code == KeyEvent.VK_D) {
             dPressed = true;
         }
@@ -55,6 +52,29 @@ public class KeyHandler implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        int code = e.getKeyCode();
+
+        /* cant implement until frames lower
+        if (code == KeyEvent.VK_UP) {
+            upPressed = false;
+        }
+        if (code == KeyEvent.VK_LEFT) {
+            leftPressed = false;
+        }
+        if (code == KeyEvent.VK_DOWN) {
+            downPressed = false;
+        }
+        if (code == KeyEvent.VK_RIGHT) {
+            rightPressed = false;
+        }
+        */
+
+        if (code == KeyEvent.VK_A) {
+            aPressed = false;
+        }
+        if (code == KeyEvent.VK_D) {
+            dPressed = false;
+        }
     }
 
 }

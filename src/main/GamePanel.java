@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
-    public static final int WIDTH = 1280;
-    public static final int HEIGHT = 720;
-    final int FPS = 60;
+    public static final int WIDTH = 1600;
+    public static final int HEIGHT = 900;
+    final int FPS = 30;
     Thread gameThread;
     PlayManager pm;
     public static Sound music = new Sound();
