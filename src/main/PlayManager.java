@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Random;
 import mino.Block;
-
 import mino.Mino;
 import mino.Mino_Bar;
 import mino.Mino_L1;
@@ -17,17 +16,18 @@ import mino.Mino_Square;
 import mino.Mino_T;
 import mino.Mino_Z1;
 import mino.Mino_Z2;
+import mino.entities.CharModel;
 
 public class PlayManager {
 
-    final int WIDTH = 360;
-    final int HEIGHT = 600;
+    final int WIDTH = 384;
+    final int HEIGHT = 704;
     public static int left_x;
     public static int right_x;
     public static int top_y;
     public static int bottom_y;
 
-    Mino currentMino;
+    public static Mino currentMino;
     final int MINO_START_X;
     final int MINO_START_Y;
     Mino nextMino;
@@ -35,7 +35,7 @@ public class PlayManager {
     final int NEXTMINO_Y;
     public static ArrayList<Block> staticBlocks =  new ArrayList<>();
 
-    public static int dropInterval = 60;
+    public static int dropInterval = 30;
     boolean gameOver;
 
     boolean effectCounterOn;
@@ -46,6 +46,8 @@ public class PlayManager {
     int lines;
     int score;
 
+    CharModel cm;
+
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
         right_x = left_x + WIDTH;
@@ -55,8 +57,11 @@ public class PlayManager {
         MINO_START_X = left_x + (WIDTH/2) - Block.SIZE;
         MINO_START_Y = top_y + Block.SIZE;
 
-        NEXTMINO_X = right_x + 175;
-        NEXTMINO_Y = top_y + 500;
+        NEXTMINO_X = right_x + 180;
+        NEXTMINO_Y = top_y + 620;
+
+        cm = new CharModel(Color.WHITE);
+        cm.setXY(left_x, bottom_y - Block.SIZE);
 
         currentMino = pickMino();
         currentMino.setXY(MINO_START_X, MINO_START_Y);
@@ -89,6 +94,14 @@ public class PlayManager {
 
             if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y == MINO_START_Y) {
                 gameOver = true;
+                GamePanel.music.stop();
+                GamePanel.se.play(2, false);
+            }
+
+            if (cm.topCollision && cm.bottomCollision) {
+                gameOver = true;
+                GamePanel.music.stop();
+                GamePanel.se.play(2, false);
             }
 
             currentMino.deactivating = false;
@@ -102,6 +115,7 @@ public class PlayManager {
         }
         else {
             currentMino.update();
+            cm.update();
         }
     }
 
@@ -159,6 +173,7 @@ public class PlayManager {
         }
 
         if (lineCount > 0) {
+            GamePanel.se.play(1, false);
             int singleLineScore = 10 * level;
             score += singleLineScore * lineCount;
         }
@@ -171,10 +186,10 @@ public class PlayManager {
 
         int x = right_x + 100;
         int y = bottom_y - 200;
-        g2.drawRect(x, y, 200, 200);
+        g2.drawRect(x, y, 220, 220);
         g2.setFont(new Font("Arial", Font.PLAIN, 30));
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.drawString("NEXT", x+60, y+60);
+        g2.drawString("NEXT", x+64, y+64);
 
         g2.drawRect(x, top_y, 250, 300);
         x += 40;
@@ -184,6 +199,8 @@ public class PlayManager {
         g2.drawString("LINES: " + lines, x, y);
         y += 70;
         g2.drawString("SCORE: " + score, x, y);
+
+        cm.draw(g2);
 
         if (currentMino != null) {
             currentMino.draw(g2);

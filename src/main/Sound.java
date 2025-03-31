@@ -4,6 +4,7 @@ import java.net.URL;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
@@ -11,6 +12,7 @@ import javax.sound.sampled.LineListener;
 public class Sound {
     Clip musicClip;
     URL url[] = new URL[10];
+    FloatControl volume;
 
     public Sound() {
         url[0] = getClass().getResource("/tetoris-active.wav");
@@ -44,6 +46,8 @@ public class Sound {
                 }
             });
             ais.close();
+            volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(-10.0f);
             clip.start();
         }
 
