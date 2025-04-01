@@ -16,20 +16,21 @@ import mino.Mino_Square;
 import mino.Mino_T;
 import mino.Mino_Z1;
 import mino.Mino_Z2;
+import mino.entities.Boss;
 import mino.entities.CharModel;
 
 public class PlayManager {
 
-    final int WIDTH = 384;
-    final int HEIGHT = 704;
+    public final int WIDTH = 384;
+    public final int HEIGHT = 768;
     public static int left_x;
     public static int right_x;
     public static int top_y;
     public static int bottom_y;
 
     public static Mino currentMino;
-    final int MINO_START_X;
-    final int MINO_START_Y;
+    public final int MINO_START_X;
+    public final int MINO_START_Y;
     Mino nextMino;
     final int NEXTMINO_X;
     final int NEXTMINO_Y;
@@ -48,6 +49,10 @@ public class PlayManager {
 
     CharModel cm;
 
+    private Boss boss;
+    private boolean bossSpawned = false;
+    private int bossSpawnTimer = 0; // Timer to track when to spawn the boss
+
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
         right_x = left_x + WIDTH;
@@ -55,10 +60,10 @@ public class PlayManager {
         bottom_y = top_y + HEIGHT;
 
         MINO_START_X = left_x + (WIDTH/2) - Block.SIZE;
-        MINO_START_Y = top_y + Block.SIZE;
+        MINO_START_Y = top_y + Block.SIZE*5;
 
         NEXTMINO_X = right_x + 180;
-        NEXTMINO_Y = top_y + 620;
+        NEXTMINO_Y = top_y + 700;
 
         cm = new CharModel(Color.WHITE);
         cm.setXY(left_x, bottom_y - Block.SIZE);
@@ -86,34 +91,45 @@ public class PlayManager {
     }
 
     public void update() {
+        if (!bossSpawned) {
+            bossSpawnTimer++;
+            if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
+                boss = new Boss(this);
+                bossSpawned = true;
+            }
+        }
+    
+        if (bossSpawned && boss != null) {
+            boss.update();
+        }
+    
         if (currentMino.active == false) {
             staticBlocks.add(currentMino.b[0]);
             staticBlocks.add(currentMino.b[1]);
             staticBlocks.add(currentMino.b[2]);
             staticBlocks.add(currentMino.b[3]);
-
+    
             if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y == MINO_START_Y) {
                 gameOver = true;
                 GamePanel.music.stop();
                 GamePanel.se.play(2, false);
             }
-
+    
             if (cm.topCollision && cm.bottomCollision) {
                 gameOver = true;
                 GamePanel.music.stop();
                 GamePanel.se.play(2, false);
             }
-
+    
             currentMino.deactivating = false;
-
+    
             currentMino = nextMino;
             currentMino.setXY(MINO_START_X, MINO_START_Y);
             nextMino = pickMino();
             nextMino.setXY(NEXTMINO_X, NEXTMINO_Y);
-
+    
             checkDelete();
-        }
-        else {
+        } else {
             currentMino.update();
             cm.update();
         }
@@ -183,14 +199,14 @@ public class PlayManager {
         g2.setColor(Color.white);
         g2.setStroke(new BasicStroke(4f));
         g2.drawRect(left_x-4, top_y-4, WIDTH+8, HEIGHT+8);
-
+    
         int x = right_x + 100;
         int y = bottom_y - 200;
         g2.drawRect(x, y, 220, 220);
         g2.setFont(new Font("Arial", Font.PLAIN, 30));
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.drawString("NEXT", x+64, y+64);
-
+    
         g2.drawRect(x, top_y, 250, 300);
         x += 40;
         y = top_y + 90;
@@ -199,34 +215,38 @@ public class PlayManager {
         g2.drawString("LINES: " + lines, x, y);
         y += 70;
         g2.drawString("SCORE: " + score, x, y);
-
+    
         cm.draw(g2);
-
+    
         if (currentMino != null) {
             currentMino.draw(g2);
         }
-
+    
         nextMino.draw(g2);
-
+    
         for (int i = 0; i < staticBlocks.size(); i++) {
             staticBlocks.get(i).draw(g2);
         }
-
+    
+        if (bossSpawned && boss != null) {
+            boss.draw(g2);
+        }
+    
         if (effectCounterOn) {
             effectCounter++;
-
+    
             g2.setColor(Color.red);
             for (int i = 0; i < effectY.size(); i++) {
                 g2.fillRect(left_x, effectY.get(i), WIDTH, Block.SIZE);
             }
-
+    
             if (effectCounter == 10) {
                 effectCounterOn = false;
                 effectCounter = 0;
                 effectY.clear();
             }
         }
-
+    
         g2.setColor(Color.yellow);
         g2.setFont(g2.getFont().deriveFont(50f));
         if (gameOver) {
@@ -239,7 +259,7 @@ public class PlayManager {
             y = top_y + 320;
             g2.drawString("PAUSED", x, y);
         }
-
+    
         x = 35;
         y = top_y + 320;
         g2.setColor(Color.white);
