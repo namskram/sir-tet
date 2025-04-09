@@ -16,6 +16,23 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
+        if (code == KeyEvent.VK_ESCAPE) {
+            if (pausePressed) {
+                pausePressed = false;
+                GamePanel.music.play(0, true);
+                GamePanel.music.loop();
+            } else {
+                pausePressed = true;
+                GamePanel.music.stop();
+            }
+        }
+
+        if (code == KeyEvent.VK_R && GamePanel.gameOver) {
+            // Restart the game if it's over
+            GamePanel gp = (GamePanel) e.getSource();
+            gp.restartGame();
+        }
+
         if (code == KeyEvent.VK_UP) {
             upPressed = true;
         }
@@ -27,17 +44,6 @@ public class KeyHandler implements KeyListener {
         }
         if (code == KeyEvent.VK_RIGHT) {
             rightPressed = true;
-        }
-        if (code == KeyEvent.VK_ESCAPE) {
-            if (pausePressed) {
-                pausePressed = false;
-                GamePanel.music.play(0, true);
-                GamePanel.music.loop();
-            }
-            else {
-                pausePressed = true;
-                GamePanel.music.stop();
-            }
         }
         if (code == KeyEvent.VK_W) {
             wPressed = true;

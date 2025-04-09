@@ -2,16 +2,12 @@ package mino.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.imageio.ImageIO;
-
 import main.GamePanel;
 import main.KeyHandler;
 import main.PlayManager;
@@ -160,7 +156,11 @@ public class CharModel {
                     Math.abs(b1.x - targetX) < Block.SIZE) {
                     bottomCollision = true;
                     inAir = false;
-                    b1.y = targetY - Block.SIZE; // Align character to the top of the block
+
+                    // Only adjust the player's position if they are falling, not jumping
+                    if (b1.y + fallSpeed > b1.y) {
+                        b1.y = targetY - Block.SIZE; // Align character to the top of the block
+                    }
                 }
 
                 // Check for left collision
@@ -193,12 +193,14 @@ public class CharModel {
             int targetY = block.y;
     
             // Check if the block is above the player
-            if (targetY < (b[0].y - Block.SIZE / 2) && Math.abs(b[0].x - targetX) < Block.SIZE) {
-                // Calculate the maximum height the player can jump before hitting the block
-                int potentialAbove = Math.max(0, (b[0].y - Block.SIZE) - targetY);
-    
-                // Update `above` only if this block is closer than the previous `above` value
-                if (potentialAbove <= jumpSpeed) {
+            if (targetY < b[0].y && Math.abs(b[0].x - targetX) < Block.SIZE) {
+                int potentialAbove = b[0].y - targetY - Block.SIZE;
+
+                // Prevent jumping if the block is directly above the player
+                if (potentialAbove <= 0) {
+                    above = 0;
+                    collisionDetected = true;
+                } else if (potentialAbove <= jumpSpeed) {
                     above = potentialAbove;
                     collisionDetected = true;
                 }
@@ -212,8 +214,21 @@ public class CharModel {
     }
     
     public void update() {
-
         checkMovementCollision();
+
+        // Check if a falling block lands on the player
+        Mino currentMino = PlayManager.currentMino;
+        for (Block block : currentMino.b) {
+            if (block.x == b[0].x && block.y == b[0].y - Block.SIZE) {
+                // Only trigger game over if the player is on the ground
+                if (bottomCollision) {
+                    GamePanel.gameOver = true;
+                    GamePanel.music.stop();
+                    GamePanel.se.play(2, false);
+                    return;
+                }
+            }
+        }
 
         if (KeyHandler.wPressed) {
             checkJumpCollision();
@@ -237,7 +252,6 @@ public class CharModel {
                 b[0].x += moveSpeed;
             }
         }
-
     }
 
     public void draw(Graphics2D g2) {

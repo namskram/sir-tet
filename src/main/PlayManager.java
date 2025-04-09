@@ -37,7 +37,7 @@ public class PlayManager {
     public static ArrayList<Block> staticBlocks =  new ArrayList<>();
 
     public static int dropInterval = 30;
-    boolean gameOver;
+    public static boolean gameOver;
 
     boolean effectCounterOn;
     int effectCounter;
@@ -91,6 +91,9 @@ public class PlayManager {
     }
 
     public void update() {
+        if (gameOver) {
+            return;
+        }
         if (!bossSpawned) {
             bossSpawnTimer++;
             if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
@@ -109,16 +112,11 @@ public class PlayManager {
             staticBlocks.add(currentMino.b[2]);
             staticBlocks.add(currentMino.b[3]);
     
-            if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y == MINO_START_Y) {
+            if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y <= MINO_START_Y + (Block.SIZE)) {
                 gameOver = true;
                 GamePanel.music.stop();
                 GamePanel.se.play(2, false);
-            }
-    
-            if (cm.topCollision && cm.bottomCollision) {
-                gameOver = true;
-                GamePanel.music.stop();
-                GamePanel.se.play(2, false);
+                return;
             }
     
             currentMino.deactivating = false;
@@ -196,17 +194,25 @@ public class PlayManager {
     }
 
     public void draw(Graphics2D g2) {
+        // Draw the Tetris box boundary
         g2.setColor(Color.white);
         g2.setStroke(new BasicStroke(4f));
-        g2.drawRect(left_x-4, top_y-4, WIDTH+8, HEIGHT+8);
-    
+        g2.drawRect(left_x - 4, top_y - 4, WIDTH + 8, HEIGHT + 8);
+
+        // Draw the game over line
+        g2.setColor(Color.red); // Use red to make it stand out
+        g2.setStroke(new BasicStroke(2f)); // Thinner line for the game over line
+        g2.drawLine(left_x, top_y + (Block.SIZE*4), right_x, top_y + (Block.SIZE*4)); // Horizontal line at the top_y position
+
+        // Draw the "NEXT" box and other UI elements
         int x = right_x + 100;
         int y = bottom_y - 200;
+        g2.setColor(Color.white);
         g2.drawRect(x, y, 220, 220);
         g2.setFont(new Font("Arial", Font.PLAIN, 30));
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.drawString("NEXT", x+64, y+64);
-    
+        g2.drawString("NEXT", x + 64, y + 64);
+
         g2.drawRect(x, top_y, 250, 300);
         x += 40;
         y = top_y + 90;
@@ -215,51 +221,66 @@ public class PlayManager {
         g2.drawString("LINES: " + lines, x, y);
         y += 70;
         g2.drawString("SCORE: " + score, x, y);
-    
+
+        // Draw the character model
         cm.draw(g2);
-    
+
+        // Draw the current and next minos
         if (currentMino != null) {
             currentMino.draw(g2);
         }
-    
         nextMino.draw(g2);
-    
+
+        // Draw all static blocks
         for (int i = 0; i < staticBlocks.size(); i++) {
             staticBlocks.get(i).draw(g2);
         }
-    
+
+        // Draw the boss if spawned
         if (bossSpawned && boss != null) {
             boss.draw(g2);
         }
-    
+
+        // Handle line clear effects
         if (effectCounterOn) {
             effectCounter++;
-    
+
             g2.setColor(Color.red);
             for (int i = 0; i < effectY.size(); i++) {
                 g2.fillRect(left_x, effectY.get(i), WIDTH, Block.SIZE);
             }
-    
+
             if (effectCounter == 10) {
                 effectCounterOn = false;
                 effectCounter = 0;
                 effectY.clear();
             }
         }
-    
+
+        // Draw the game over screen
         g2.setColor(Color.yellow);
         g2.setFont(g2.getFont().deriveFont(50f));
         if (gameOver) {
-            x = left_x + 25;
+            x = left_x + 70;
             y = top_y + 320;
+            g2.setColor(Color.yellow);
+            g2.setFont(g2.getFont().deriveFont(50f));
             g2.drawString("GAME OVER", x, y);
+
+            g2.setFont(g2.getFont().deriveFont(30f));
+            g2.drawString("Press R to Restart", x, y + 50);
         }
+
+        // Draw the pause screen
         if (KeyHandler.pausePressed) {
             x = left_x + 70;
             y = top_y + 320;
+            g2.setColor(Color.yellow);
+            g2.setFont(g2.getFont().deriveFont(50f));
             g2.drawString("PAUSED", x, y);
         }
-    
+
+        // Draw the title
         x = 35;
         y = top_y + 320;
         g2.setColor(Color.white);

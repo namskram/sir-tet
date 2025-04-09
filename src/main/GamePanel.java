@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
+import static main.PlayManager.staticBlocks;
 
 public class GamePanel extends JPanel implements Runnable {
     public static final int WIDTH = 1600;
@@ -14,6 +15,7 @@ public class GamePanel extends JPanel implements Runnable {
     PlayManager pm;
     public static Sound music = new Sound();
     public static Sound se = new Sound();
+    public static boolean gameOver = false;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -54,11 +56,13 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void update() {
-        if (KeyHandler.pausePressed == false && pm.gameOver == false) {
+    public void update() {
+        if (!gameOver && !KeyHandler.pausePressed) {
             pm.update();
         }
-
+        else if (gameOver){
+            PlayManager.gameOver = true;
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -66,5 +70,14 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D)g;
         pm.draw(g2);
+    }
+
+    public void restartGame() {
+        gameOver = false;
+        pm = new PlayManager(); // Reinitialize the PlayManager
+        staticBlocks.clear(); // Clear all static blocks
+        music.stop();
+        music.play(0, true);
+        music.loop();
     }
 }
