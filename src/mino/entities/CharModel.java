@@ -24,7 +24,7 @@ public class CharModel {
     public int x, y;
     private final float moveSpeed = Block.SIZE/2; // 8 -> 16
     private final float jumpSpeed = Block.SIZE*2.5f; // 128 -> 64 -> 70
-    private final float fallSpeed = Block.SIZE/4; // 4 -> 8
+    private float fallSpeed = Block.SIZE/4; // 4 -> 8
     private boolean inAir = false;
     private float above;
 
@@ -109,15 +109,18 @@ public class CharModel {
         }
 
         for (Block b1 : b) {
-            if (b1.y + fallSpeed == PlayManager.bottom_y - Block.SIZE + fallSpeed) {
+            if (b1.y + fallSpeed >= PlayManager.bottom_y - Block.SIZE) {
                 bottomCollision = true;
                 inAir = false;
+                b1.y = PlayManager.bottom_y - Block.SIZE; // Align character to the top of the floor
             }
         }
 
+        /*
         if (!bottomCollision) {
             b[0].y += fallSpeed;
         }
+        */
     }
 
     private void checkMovingBlockCollision() {
@@ -137,7 +140,7 @@ public class CharModel {
             }
     
             // Check for bottom collision
-            if (b[0].y + fallSpeed > b1.y - Block.SIZE && b[0].y < b1.y &&
+            if (b[0].y + fallSpeed >= b1.y - Block.SIZE && b[0].y < b1.y &&
                 Math.abs(b1.x - b[0].x) < Block.SIZE) {
                 bottomCollision = true;
                 inAir = false;
@@ -152,7 +155,7 @@ public class CharModel {
 
             for (Block b1 : b) {
                 // Check for bottom collision
-                if (b1.y + fallSpeed > targetY - Block.SIZE && b1.y < targetY &&
+                if (b1.y + fallSpeed >= targetY - Block.SIZE && b1.y < targetY &&
                     Math.abs(b1.x - targetX) < Block.SIZE) {
                     bottomCollision = true;
                     inAir = false;
@@ -215,6 +218,15 @@ public class CharModel {
     
     public void update() {
         checkMovementCollision();
+
+        if (!bottomCollision) {
+            b[0].y += fallSpeed;
+            fallSpeed *= 1.2f;
+        }
+        else {
+            fallSpeed = Block.SIZE/4;
+            //b[0].y = PlayManager.bottom_y - Block.SIZE;
+        }
 
         // Check if a falling block lands on the player
         Mino currentMino = PlayManager.currentMino;
