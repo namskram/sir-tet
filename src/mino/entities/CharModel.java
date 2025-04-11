@@ -236,7 +236,7 @@ public class CharModel {
                 if (bottomCollision) {
                     GamePanel.gameOver = true;
                     GamePanel.music.stop();
-                    GamePanel.se.play(2, false);
+                    GamePanel.music.play(2, false);
                     return;
                 }
             }

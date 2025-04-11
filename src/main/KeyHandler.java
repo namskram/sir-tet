@@ -1,13 +1,14 @@
 package main;
 
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public class KeyHandler implements KeyListener {
+public class KeyHandler extends KeyAdapter {
 
     public static boolean upPressed, downPressed, leftPressed, rightPressed, pausePressed;
     public static boolean wPressed, aPressed, sPressed, dPressed;
-    
+    public static boolean rPressed = false;
+
     @Override
     public void keyTyped(KeyEvent e) {
     }

@@ -1,16 +1,13 @@
 package main;
 
 import java.net.URL;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineEvent.Type;
-import javax.sound.sampled.LineListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.sound.sampled.*;
 
 public class Sound {
-    Clip musicClip;
+    private Clip musicClip;
+    private List<Clip> activeClips = new ArrayList<>(); // Track all active clips
     URL url[] = new URL[10];
     FloatControl volume;
 
@@ -33,35 +30,49 @@ public class Sound {
             Clip clip = AudioSystem.getClip();
 
             if (music) {
-                musicClip = clip;
+                if (musicClip != null && musicClip.isRunning()) {
+                    musicClip.stop(); // Stop the previous music
+                }
+                musicClip = clip; // Set the new music clip
             }
 
             clip.open(ais);
-            clip.addLineListener(new LineListener() {
-                @Override
-                public void update(LineEvent event) {
-                    if (event.getType() == Type.STOP) {
-                        clip.close();
-                    }
+            clip.addLineListener(event -> {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    clip.close();
                 }
             });
+
+            activeClips.add(clip); // Track this clip
             ais.close();
             volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             volume.setValue(-10.0f);
             clip.start();
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void loop() {
-        musicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        if (musicClip != null) {
+            musicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        }
     }
 
     public void stop() {
-        musicClip.stop();
-        musicClip.close();
+        // Stop the main music clip
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop();
+            musicClip.close();
+        }
+
+        // Stop all active clips
+        for (Clip clip : activeClips) {
+            if (clip.isRunning()) {
+                clip.stop();
+                clip.close();
+            }
+        }
+        activeClips.clear(); // Clear the list of active clips
     }
 }

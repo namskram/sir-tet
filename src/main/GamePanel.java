@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import static main.PlayManager.staticBlocks;
+import mino.Block;
 
 public class GamePanel extends JPanel implements Runnable {
     public static final int WIDTH = 1600;
@@ -60,9 +61,6 @@ public class GamePanel extends JPanel implements Runnable {
         if (!gameOver && !KeyHandler.pausePressed) {
             pm.update();
         }
-        else if (gameOver){
-            PlayManager.gameOver = true;
-        }
     }
 
     public void paintComponent(Graphics g) {
@@ -73,9 +71,15 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void restartGame() {
-        gameOver = false;
         pm = new PlayManager(); // Reinitialize the PlayManager
+        gameOver = false; // Reset game over state
+        KeyHandler.pausePressed = false; // Ensure the game is not paused
         staticBlocks.clear(); // Clear all static blocks
+
+        // Reset the character model position
+        pm.cm.setXY(PlayManager.left_x + (pm.WIDTH / 2), PlayManager.bottom_y - Block.SIZE);
+
+        // Reset the music
         music.stop();
         music.play(0, true);
         music.loop();

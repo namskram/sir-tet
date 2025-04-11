@@ -113,9 +113,9 @@ public class PlayManager {
             staticBlocks.add(currentMino.b[3]);
     
             if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y <= MINO_START_Y + (Block.SIZE)) {
-                gameOver = true;
+                GamePanel.gameOver = true;
                 GamePanel.music.stop();
-                GamePanel.se.play(2, false);
+                GamePanel.music.play(2, false);
                 return;
             }
     
@@ -258,13 +258,11 @@ public class PlayManager {
         }
 
         // Draw the game over screen
-        g2.setColor(Color.yellow);
-        g2.setFont(g2.getFont().deriveFont(50f));
-        if (gameOver) {
-            x = left_x + 70;
-            y = top_y + 320;
+        if (GamePanel.gameOver) {
             g2.setColor(Color.yellow);
             g2.setFont(g2.getFont().deriveFont(50f));
+            x = PlayManager.left_x + 70;
+            y = PlayManager.top_y + 320;
             g2.drawString("GAME OVER", x, y);
 
             g2.setFont(g2.getFont().deriveFont(30f));
