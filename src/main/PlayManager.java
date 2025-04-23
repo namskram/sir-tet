@@ -276,6 +276,9 @@ public class PlayManager {
             g2.setColor(Color.yellow);
             g2.setFont(g2.getFont().deriveFont(50f));
             g2.drawString("PAUSED", x, y);
+
+            g2.setFont(g2.getFont().deriveFont(30f));
+            g2.drawString("Press R to Restart", x, y + 50);
         }
 
         // Draw the title

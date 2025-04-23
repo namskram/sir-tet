@@ -28,10 +28,12 @@ public class KeyHandler extends KeyAdapter {
             }
         }
 
-        if (code == KeyEvent.VK_R && GamePanel.gameOver) {
+        if (code == KeyEvent.VK_R) {
             // Restart the game if it's over
-            GamePanel gp = (GamePanel) e.getSource();
-            gp.restartGame();
+            if (GamePanel.gameOver || pausePressed) {
+                GamePanel gp = (GamePanel) e.getSource();
+                gp.restartGame();
+            }
         }
 
         if (code == KeyEvent.VK_UP) {
