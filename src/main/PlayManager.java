@@ -52,6 +52,8 @@ public class PlayManager {
     private Boss boss;
     private boolean bossSpawned = false;
     private int bossSpawnTimer = 0; // Timer to track when to spawn the boss
+    private boolean fadingIn;
+    private float bossMusicVolume = -80.0f;
 
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
@@ -96,11 +98,37 @@ public class PlayManager {
         }
         if (!bossSpawned) {
             bossSpawnTimer++;
+
+            // Play the "boss incoming" sound 5 seconds before the boss spawns
+            if (bossSpawnTimer == 210) { // 7 seconds at 30 FPS
+                GamePanel.music.stop(); // Stop any current music
+                GamePanel.music.play(7, false); // Play "utsuho incoming.wav"
+            }
+
             if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
                 boss = new Boss(this);
                 bossSpawned = true;
+
+                GamePanel.music.stop();
+                GamePanel.music.play(6, true); // Play boss music
+                GamePanel.music.setVolume(-20.0f); // Set the volume for the boss music
+                GamePanel.music.loop();
+                //fadingIn = true;
             }
         }
+        /*
+
+        if (fadingIn) {
+            if (bossMusicVolume < 0.0f) {
+                bossMusicVolume += 2.0f; 
+                GamePanel.music.setVolume(bossMusicVolume);
+                System.out.println("Fading in: Volume = " + bossMusicVolume);
+            } else {
+                fadingIn = false; 
+                System.out.println("Fade-in complete: Volume = " + bossMusicVolume);
+            }
+        }
+        */
     
         if (bossSpawned && boss != null) {
             boss.update();

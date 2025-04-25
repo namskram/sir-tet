@@ -22,6 +22,7 @@ public class Sound {
         url[4] = getClass().getResource("/touch floor.wav");
         url[5] = getClass().getResource("/tetris-active.wav");
         url[6] = getClass().getResource("/marunouchi survivor.wav");
+        url[7] = getClass().getResource("/utsuho incoming.wav");
     }
 
     public void play(int i, boolean music) {
@@ -75,4 +76,10 @@ public class Sound {
         }
         activeClips.clear(); // Clear the list of active clips
     }
+
+    public void setVolume(float value) {
+        if (volume != null) {
+            volume.setValue(value);
+        }
+    }   
 }
