@@ -203,7 +203,9 @@ public class CharModel {
                 if (potentialAbove <= 0) {
                     above = 0;
                     collisionDetected = true;
-                } else if (potentialAbove <= jumpSpeed) {
+                } 
+                
+                else if (potentialAbove <= jumpSpeed) {
                     above = potentialAbove;
                     collisionDetected = true;
                 }
@@ -231,7 +233,9 @@ public class CharModel {
         // Check if a falling block lands on the player
         Mino currentMino = PlayManager.currentMino;
         for (Block block : currentMino.b) {
-            if (block.x == b[0].x && block.y == b[0].y - Block.SIZE) {
+            // Check if the block overlaps with the player's x position
+            if (block.x < b[0].x + Block.SIZE && block.x + Block.SIZE > b[0].x &&
+                block.y == b[0].y - Block.SIZE) {
                 // Only trigger game over if the player is on the ground
                 if (bottomCollision) {
                     GamePanel.gameOver = true;

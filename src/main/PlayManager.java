@@ -261,17 +261,17 @@ public class PlayManager {
         if (GamePanel.gameOver) {
             g2.setColor(Color.yellow);
             g2.setFont(g2.getFont().deriveFont(50f));
-            x = PlayManager.left_x + 70;
+            x = PlayManager.left_x + 50;
             y = PlayManager.top_y + 320;
             g2.drawString("GAME OVER", x, y);
 
             g2.setFont(g2.getFont().deriveFont(30f));
-            g2.drawString("Press R to Restart", x, y + 50);
+            g2.drawString("Press R to Restart", x + 20, y + 50);
         }
 
         // Draw the pause screen
         if (KeyHandler.pausePressed) {
-            x = left_x + 70;
+            x = left_x + 80;
             y = top_y + 320;
             g2.setColor(Color.yellow);
             g2.setFont(g2.getFont().deriveFont(50f));
