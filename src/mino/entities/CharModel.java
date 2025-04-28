@@ -125,25 +125,34 @@ public class CharModel {
 
     private void checkMovingBlockCollision() {
         Mino currentMino = PlayManager.currentMino;
-    
+
         for (Block b1 : currentMino.b) {
-            // Check for left collision
-            if (b[0].x - moveSpeed < b1.x + Block.SIZE && b[0].x >= b1.x + Block.SIZE &&
-                Math.abs(b1.y - b[0].y) < Block.SIZE) {
-                leftCollision = true;
-            }
-    
-            // Check for right collision
-            if (b[0].x + moveSpeed + Block.SIZE > b1.x && b[0].x <= b1.x &&
-                Math.abs(b1.y - b[0].y) < Block.SIZE) {
-                rightCollision = true;
-            }
-    
             // Check for bottom collision
             if (b[0].y + fallSpeed >= b1.y - Block.SIZE && b[0].y < b1.y &&
                 Math.abs(b1.x - b[0].x) < Block.SIZE) {
                 bottomCollision = true;
                 inAir = false;
+
+                // Align the player to the top of the block
+                b[0].y = b1.y - Block.SIZE;
+
+                // Reset fallSpeed to prevent skipping
+                fallSpeed = Block.SIZE / 4;
+
+                // Skip side collision checks if a bottom collision is detected
+                continue;
+            }
+
+            // Check for left collision
+            if (b[0].x - moveSpeed < b1.x + Block.SIZE && b[0].x >= b1.x + Block.SIZE &&
+                Math.abs(b1.y - b[0].y) < Block.SIZE) {
+                leftCollision = true;
+            }
+
+            // Check for right collision
+            if (b[0].x + moveSpeed + Block.SIZE > b1.x && b[0].x <= b1.x &&
+                Math.abs(b1.y - b[0].y) < Block.SIZE) {
+                rightCollision = true;
             }
         }
     }
@@ -160,10 +169,14 @@ public class CharModel {
                     bottomCollision = true;
                     inAir = false;
 
-                    // Only adjust the player's position if they are falling, not jumping
-                    if (b1.y + fallSpeed > b1.y) {
-                        b1.y = targetY - Block.SIZE; // Align character to the top of the block
-                    }
+                    // Align the player to the top of the block
+                    b1.y = targetY - Block.SIZE;
+
+                    // Reset fallSpeed to prevent skipping
+                    fallSpeed = Block.SIZE / 4;
+
+                    // Skip side collision checks if a bottom collision is detected
+                    continue;
                 }
 
                 // Check for left collision
@@ -186,32 +199,32 @@ public class CharModel {
     private void checkJumpCollision() {
         above = jumpSpeed; // Default jump height if no block is above
         boolean collisionDetected = false; // Track if any block is actually blocking the jump
-    
+
         // Combine static and moving blocks into one list
         List<Block> allBlocks = new ArrayList<>(PlayManager.staticBlocks);
         allBlocks.addAll(Arrays.asList(PlayManager.currentMino.b));
-    
+
         for (Block block : allBlocks) {
             int targetX = block.x;
             int targetY = block.y;
-    
-            // Check if the block is above the player
-            if (targetY < b[0].y && Math.abs(b[0].x - targetX) < Block.SIZE) {
+
+            // Check if the block is along the player's upward path
+            if (b[0].y - jumpSpeed < targetY + Block.SIZE && b[0].y > targetY && // Block is in the upward path
+                Math.abs(b[0].x - targetX) < Block.SIZE) { // Block overlaps horizontally
                 int potentialAbove = b[0].y - targetY - Block.SIZE;
 
                 // Prevent jumping if the block is directly above the player
                 if (potentialAbove <= 0) {
-                    above = 0;
+                    above = 0; // No jump allowed
                     collisionDetected = true;
-                } 
-                
-                else if (potentialAbove <= jumpSpeed) {
-                    above = potentialAbove;
+                    break; // Exit the loop since a collision is detected
+                } else if (potentialAbove <= jumpSpeed) {
+                    above = potentialAbove; // Adjust jump height to avoid clipping
                     collisionDetected = true;
                 }
             }
         }
-    
+
         // Reset `above` to default if no collisions were detected
         if (!collisionDetected) {
             above = jumpSpeed;
@@ -223,7 +236,7 @@ public class CharModel {
 
         if (!bottomCollision) {
             b[0].y += fallSpeed;
-            fallSpeed *= 1.2f;
+            fallSpeed *= 1.2f; // velocity
         }
         else {
             fallSpeed = Block.SIZE/4;
