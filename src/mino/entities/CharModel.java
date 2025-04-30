@@ -2,16 +2,12 @@ package mino.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.imageio.ImageIO;
-
 import main.GamePanel;
 import main.KeyHandler;
 import main.PlayManager;
@@ -28,7 +24,7 @@ public class CharModel {
     public int x, y;
     private final float moveSpeed = Block.SIZE/2; // 8 -> 16
     private final float jumpSpeed = Block.SIZE*2.5f; // 128 -> 64 -> 70
-    private final float fallSpeed = Block.SIZE/4; // 4 -> 8
+    private float fallSpeed = Block.SIZE/4; // 4 -> 8
     private boolean inAir = false;
     private float above;
 
@@ -113,38 +109,50 @@ public class CharModel {
         }
 
         for (Block b1 : b) {
-            if (b1.y + fallSpeed == PlayManager.bottom_y - Block.SIZE + fallSpeed) {
+            if (b1.y + fallSpeed >= PlayManager.bottom_y - Block.SIZE) {
                 bottomCollision = true;
                 inAir = false;
+                b1.y = PlayManager.bottom_y - Block.SIZE; // Align character to the top of the floor
             }
         }
 
+        /*
         if (!bottomCollision) {
             b[0].y += fallSpeed;
         }
+        */
     }
 
     private void checkMovingBlockCollision() {
         Mino currentMino = PlayManager.currentMino;
-    
+
         for (Block b1 : currentMino.b) {
+            // Check for bottom collision
+            if (b[0].y + fallSpeed >= b1.y - Block.SIZE && b[0].y < b1.y &&
+                Math.abs(b1.x - b[0].x) < Block.SIZE) {
+                bottomCollision = true;
+                inAir = false;
+
+                // Align the player to the top of the block
+                b[0].y = b1.y - Block.SIZE;
+
+                // Reset fallSpeed to prevent skipping
+                fallSpeed = Block.SIZE / 4;
+
+                // Skip side collision checks if a bottom collision is detected
+                continue;
+            }
+
             // Check for left collision
             if (b[0].x - moveSpeed < b1.x + Block.SIZE && b[0].x >= b1.x + Block.SIZE &&
                 Math.abs(b1.y - b[0].y) < Block.SIZE) {
                 leftCollision = true;
             }
-    
+
             // Check for right collision
             if (b[0].x + moveSpeed + Block.SIZE > b1.x && b[0].x <= b1.x &&
                 Math.abs(b1.y - b[0].y) < Block.SIZE) {
                 rightCollision = true;
-            }
-    
-            // Check for bottom collision
-            if (b[0].y + fallSpeed > b1.y - Block.SIZE && b[0].y < b1.y &&
-                Math.abs(b1.x - b[0].x) < Block.SIZE) {
-                bottomCollision = true;
-                inAir = false;
             }
         }
     }
@@ -156,11 +164,19 @@ public class CharModel {
 
             for (Block b1 : b) {
                 // Check for bottom collision
-                if (b1.y + fallSpeed > targetY - Block.SIZE && b1.y < targetY &&
+                if (b1.y + fallSpeed >= targetY - Block.SIZE && b1.y < targetY &&
                     Math.abs(b1.x - targetX) < Block.SIZE) {
                     bottomCollision = true;
                     inAir = false;
-                    b1.y = targetY - Block.SIZE; // Align character to the top of the block
+
+                    // Align the player to the top of the block
+                    b1.y = targetY - Block.SIZE;
+
+                    // Reset fallSpeed to prevent skipping
+                    fallSpeed = Block.SIZE / 4;
+
+                    // Skip side collision checks if a bottom collision is detected
+                    continue;
                 }
 
                 // Check for left collision
@@ -183,28 +199,32 @@ public class CharModel {
     private void checkJumpCollision() {
         above = jumpSpeed; // Default jump height if no block is above
         boolean collisionDetected = false; // Track if any block is actually blocking the jump
-    
+
         // Combine static and moving blocks into one list
         List<Block> allBlocks = new ArrayList<>(PlayManager.staticBlocks);
         allBlocks.addAll(Arrays.asList(PlayManager.currentMino.b));
-    
+
         for (Block block : allBlocks) {
             int targetX = block.x;
             int targetY = block.y;
-    
-            // Check if the block is above the player
-            if (targetY < (b[0].y - Block.SIZE / 2) && Math.abs(b[0].x - targetX) < Block.SIZE) {
-                // Calculate the maximum height the player can jump before hitting the block
-                int potentialAbove = Math.max(0, (b[0].y - Block.SIZE) - targetY);
-    
-                // Update `above` only if this block is closer than the previous `above` value
-                if (potentialAbove <= jumpSpeed) {
-                    above = potentialAbove;
+
+            // Check if the block is along the player's upward path
+            if (b[0].y - jumpSpeed < targetY + Block.SIZE && b[0].y > targetY && // Block is in the upward path
+                Math.abs(b[0].x - targetX) < Block.SIZE) { // Block overlaps horizontally
+                int potentialAbove = b[0].y - targetY - Block.SIZE;
+
+                // Prevent jumping if the block is directly above the player
+                if (potentialAbove <= 0) {
+                    above = 0; // No jump allowed
+                    collisionDetected = true;
+                    break; // Exit the loop since a collision is detected
+                } else if (potentialAbove <= jumpSpeed) {
+                    above = potentialAbove; // Adjust jump height to avoid clipping
                     collisionDetected = true;
                 }
             }
         }
-    
+
         // Reset `above` to default if no collisions were detected
         if (!collisionDetected) {
             above = jumpSpeed;
@@ -212,8 +232,32 @@ public class CharModel {
     }
     
     public void update() {
-
         checkMovementCollision();
+
+        if (!bottomCollision) {
+            b[0].y += fallSpeed;
+            fallSpeed *= 1.2f; // velocity
+        }
+        else {
+            fallSpeed = Block.SIZE/4;
+            //b[0].y = PlayManager.bottom_y - Block.SIZE;
+        }
+
+        // Check if a falling block lands on the player
+        Mino currentMino = PlayManager.currentMino;
+        for (Block block : currentMino.b) {
+            // Check if the block overlaps with the player's x position
+            if (block.x < b[0].x + Block.SIZE && block.x + Block.SIZE > b[0].x &&
+                block.y == b[0].y - Block.SIZE) {
+                // Only trigger game over if the player is on the ground
+                if (bottomCollision) {
+                    GamePanel.gameOver = true;
+                    GamePanel.music.stop();
+                    GamePanel.music.play(2, false);
+                    return;
+                }
+            }
+        }
 
         if (KeyHandler.wPressed) {
             checkJumpCollision();
@@ -237,7 +281,6 @@ public class CharModel {
                 b[0].x += moveSpeed;
             }
         }
-
     }
 
     public void draw(Graphics2D g2) {

@@ -214,7 +214,7 @@ public class Mino {
 
         deactivateCounter++;
 
-        if (deactivateCounter == 45) {
+        if (deactivateCounter == 20) {
             deactivateCounter = 0;
             checkMovementCollision();
 
