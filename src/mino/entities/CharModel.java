@@ -28,6 +28,9 @@ public class CharModel {
     private boolean inAir = false;
     private float above;
     public List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
+    private double aimAngle = 0; // Current aiming angle in degrees
+    private int shootCooldown = 10; // Limit rate of fire to 10 frames
+    private int shootTimer = 0; // Timer to track frames since the last shot
 
     public CharModel(Color c) {
         b[0] = new Block(c);
@@ -253,9 +256,25 @@ public class CharModel {
             }
         }
 
+        // Adjust aiming angle with Q and E
+        if (KeyHandler.qPressed) {
+            aimAngle = Math.max(aimAngle - 5, -45); // Decrease angle, limit to -45 degrees
+            // KeyHandler.qPressed = false;
+        }
+        if (KeyHandler.ePressed) {
+            aimAngle = Math.min(aimAngle + 5, 45); // Increase angle, limit to 45 degrees
+            // KeyHandler.ePressed = false;
+        }
+
+        // Increment the shoot timer
+        if (shootTimer > 0) {
+            shootTimer--;
+        }
+
         // Shoot a projectile when the spacebar is pressed
-        if (KeyHandler.spacePressed) { // Use 'R' as an example key
+        if (KeyHandler.spacePressed && shootTimer == 0) { // Use 'R' as an example key
             shootProjectile();
+            shootTimer = shootCooldown;
             // KeyHandler.spacePressed = false; // Prevent continuous shooting
         }
 
@@ -303,7 +322,7 @@ public class CharModel {
         // Spawn a projectile at the player's position
         int projectileX = b[0].x + Block.SIZE / 4; // Center the projectile horizontally
         int projectileY = b[0].y - Block.SIZE / 2; // Spawn above the player
-        projectiles.add(new Projectile(projectileX, projectileY));
+        projectiles.add(new Projectile(projectileX, projectileY, aimAngle));
     }
 
     public void draw(Graphics2D g2) {
@@ -320,6 +339,12 @@ public class CharModel {
         for (Projectile projectile : projectiles) {
             projectile.draw(g2);
         }
+
+        // Draw the aiming angle indicator (optional)
+        g2.setColor(Color.RED);
+        int aimLineX = b[0].x + Block.SIZE / 2 + (int) (50 * Math.sin(Math.toRadians(aimAngle)));
+        int aimLineY = b[0].y - (int) (50 * Math.cos(Math.toRadians(aimAngle)));
+        g2.drawLine(b[0].x + Block.SIZE / 2, b[0].y, aimLineX, aimLineY);
 
     }
     
