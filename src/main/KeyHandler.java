@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 public class KeyHandler extends KeyAdapter {
 
     public static boolean upPressed, downPressed, leftPressed, rightPressed, pausePressed;
-    public static boolean wPressed, aPressed, sPressed, dPressed;
+    public static boolean wPressed, aPressed, sPressed, dPressed, spacePressed;
     public static boolean rPressed = false;
 
     @Override
@@ -57,6 +57,9 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_D) {
             dPressed = true;
         }
+        if (code == KeyEvent.VK_SPACE) {
+            spacePressed = true;
+        }
     }
 
     @Override
@@ -83,6 +86,9 @@ public class KeyHandler extends KeyAdapter {
         }
         if (code == KeyEvent.VK_D) {
             dPressed = false;
+        }
+        if (code == KeyEvent.VK_SPACE) {
+            spacePressed = false;
         }
     }
 

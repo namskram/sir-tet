@@ -27,6 +27,7 @@ public class CharModel {
     private float fallSpeed = Block.SIZE/4; // 4 -> 8
     private boolean inAir = false;
     private float above;
+    public List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
 
     public CharModel(Color c) {
         b[0] = new Block(c);
@@ -243,6 +244,21 @@ public class CharModel {
             //b[0].y = PlayManager.bottom_y - Block.SIZE;
         }
 
+        // Update projectiles
+        for (int i = projectiles.size() - 1; i >= 0; i--) {
+            Projectile projectile = projectiles.get(i);
+            projectile.update();
+            if (!projectile.active) {
+                projectiles.remove(i); // Remove inactive projectiles
+            }
+        }
+
+        // Shoot a projectile when the spacebar is pressed
+        if (KeyHandler.spacePressed) { // Use 'R' as an example key
+            shootProjectile();
+            // KeyHandler.spacePressed = false; // Prevent continuous shooting
+        }
+
         // Check if a falling block lands on the player
         Mino currentMino = PlayManager.currentMino;
         for (Block block : currentMino.b) {
@@ -283,8 +299,15 @@ public class CharModel {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    private void shootProjectile() {
+        // Spawn a projectile at the player's position
+        int projectileX = b[0].x + Block.SIZE / 4; // Center the projectile horizontally
+        int projectileY = b[0].y - Block.SIZE / 2; // Spawn above the player
+        projectiles.add(new Projectile(projectileX, projectileY));
+    }
 
+    public void draw(Graphics2D g2) {
+        // Draw the character
         int margin = 16;
         BufferedImage image = null;
         switch (dir) {
@@ -292,6 +315,11 @@ public class CharModel {
             case "right" -> image = right;
         }
         g2.drawImage(image, b[0].x-margin, b[0].y-margin, 64, 64, null);
+
+        // Draw projectiles
+        for (Projectile projectile : projectiles) {
+            projectile.draw(g2);
+        }
 
     }
     

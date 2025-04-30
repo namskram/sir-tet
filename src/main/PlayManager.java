@@ -155,7 +155,9 @@ public class PlayManager {
             nextMino.setXY(NEXTMINO_X, NEXTMINO_Y);
     
             checkDelete();
-        } else {
+        } 
+        
+        else {
             currentMino.update();
             cm.update();
         }
