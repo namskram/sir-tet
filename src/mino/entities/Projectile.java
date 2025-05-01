@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
+import main.PlayManager;
 import mino.Block;
 
 public class Projectile {
@@ -13,7 +14,7 @@ public class Projectile {
     private final int height = Block.SIZE; // Height of the projectile
     private final Color color = Color.YELLOW; // Color of the projectile
     public boolean active = true; // Whether the projectile is still active
-    private double angle; // Angle of the projectile in degrees
+    private final double angle; // Angle of the projectile in degrees
 
     public Projectile(int x, int y, double angle) {
         this.x = x;
@@ -25,6 +26,35 @@ public class Projectile {
         // Move the projectile based on its angle
         x += (int) (speed * Math.sin(angle)); // Horizontal movement
         y -= (int) (speed * Math.cos(angle)); // Vertical movement
+
+        // Check collision with static blocks
+    for (int i = 0; i < PlayManager.staticBlocks.size(); i++) {
+        Block block = PlayManager.staticBlocks.get(i);
+        if (x < block.x + Block.SIZE && x + width > block.x && // Horizontal overlap
+            y < block.y + Block.SIZE && y + height > block.y) { // Vertical overlap
+            active = false; // Deactivate the projectile
+            // PlayManager.staticBlocks.remove(i); // Can add destroy block feature
+            break; // Exit the loop after collision
+        }
+    }
+
+    // Check collision with falling blocks (current mino)
+    for (Block block : PlayManager.currentMino.b) {
+        if (x < block.x + Block.SIZE && x + width > block.x && // Horizontal overlap
+            y < block.y + Block.SIZE && y + height > block.y) { // Vertical overlap
+            active = false; // Deactivate the projectile
+            break; // Exit the loop after collision
+        }
+    }
+
+    // Check collision with the boss
+    if (PlayManager.bossSpawned && PlayManager.boss != null) {
+        if (x < PlayManager.boss.x + 128 && x + width > PlayManager.boss.x && // Horizontal overlap
+            y < PlayManager.boss.y + 128 && y + height > PlayManager.boss.y) { // Vertical overlap
+            active = false; // Deactivate the projectile
+            PlayManager.boss.takeDamage(1); // Damage the boss (implement `takeDamage` in Boss)
+        }
+    }
 
         // Deactivate the projectile if it goes out of bounds
         if (y < 7 || x < Block.SIZE * 19 || x > Block.SIZE * 31) { // Adjust bounds as needed

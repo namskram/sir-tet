@@ -10,6 +10,7 @@ public class Boss {
     public int x, y;
     public int speedX = 4; // Horizontal speed
     public int speedY = 2; // Vertical speed
+    private int health = 20;
     private BufferedImage sprite;
     private PlayManager playManager; // Reference to the PlayManager instance
 
@@ -17,8 +18,8 @@ public class Boss {
         this.playManager = playManager; // Store the PlayManager reference
 
         // Initial position (centered horizontally within the Tetris box)
-        x = playManager.left_x + (playManager.WIDTH / 2) - 64; // Center horizontally
-        y = playManager.top_y + 32; // Spawn near the top of the Tetris box
+        x = PlayManager.left_x + (playManager.WIDTH / 2) - 64; // Center horizontally
+        y = PlayManager.top_y + 32; // Spawn near the top of the Tetris box
 
         // Load placeholder sprite
         try {
@@ -28,16 +29,26 @@ public class Boss {
         }
     }
 
+    public void takeDamage(int damage) {
+        health -= damage;
+        System.out.println("Boss health: " + health); // Debugging output
+
+        if (health <= 0) {
+            System.out.println("Boss defeated!");
+            PlayManager.bossAlive = false; // Set boss alive status to false
+        }
+    }
+
     public void update() {
         // Move the boss left and right
         x += speedX;
 
         // Reverse direction if hitting the Tetris box boundaries horizontally
-        if (x <= playManager.left_x) {
-            x = playManager.left_x; // Prevent going out of bounds
+        if (x <= PlayManager.left_x) {
+            x = PlayManager.left_x; // Prevent going out of bounds
             speedX = -speedX;
-        } else if (x >= playManager.right_x - 128) { // Assuming boss sprite width is 128
-            x = playManager.right_x - 128; // Prevent going out of bounds
+        } else if (x >= PlayManager.right_x - 128) { // Assuming boss sprite width is 128
+            x = PlayManager.right_x - 128; // Prevent going out of bounds
             speedX = -speedX;
         }
 
@@ -45,8 +56,8 @@ public class Boss {
         y += speedY;
 
         // Reverse direction if hitting the Tetris box boundaries vertically
-        if (y <= playManager.top_y) {
-            y = playManager.top_y; // Prevent going out of bounds
+        if (y <= PlayManager.top_y) {
+            y = PlayManager.top_y; // Prevent going out of bounds
             speedY = -speedY;
         } else if (y >= playManager.MINO_START_Y - 128) { // Stay above the Tetris blocks
             y = playManager.MINO_START_Y - 128; // Prevent going out of bounds
