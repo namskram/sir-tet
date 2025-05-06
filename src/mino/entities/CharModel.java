@@ -31,6 +31,7 @@ public class CharModel {
     private double aimAngle = 0; // Current aiming angle in degrees
     private int shootCooldown = 10; // Limit rate of fire to 10 frames
     private int shootTimer = 0; // Timer to track frames since the last shot
+    private int health = 10;
 
     public CharModel(Color c) {
         b[0] = new Block(c);
@@ -258,11 +259,11 @@ public class CharModel {
 
         // Adjust aiming angle with Q and E
         if (KeyHandler.qPressed) {
-            aimAngle = Math.max(aimAngle - 5, -45); // Decrease angle, limit to -45 degrees
+            aimAngle = Math.max(aimAngle - 4, -40); // Decrease angle, limit to -45 degrees
             // KeyHandler.qPressed = false;
         }
         if (KeyHandler.ePressed) {
-            aimAngle = Math.min(aimAngle + 5, 45); // Increase angle, limit to 45 degrees
+            aimAngle = Math.min(aimAngle + 4, 40); // Increase angle, limit to 45 degrees
             // KeyHandler.ePressed = false;
         }
 
@@ -322,7 +323,15 @@ public class CharModel {
         // Spawn a projectile at the player's position
         int projectileX = b[0].x + Block.SIZE / 4; // Center the projectile horizontally
         int projectileY = b[0].y - Block.SIZE / 2; // Spawn above the player
-        projectiles.add(new Projectile(projectileX, projectileY, aimAngle));
+        projectiles.add(new Projectile(projectileX, projectileY, aimAngle, "player"));
+    }
+
+    public void takeDamage(int damage) {
+        health -= damage;
+        if (health <= 0) {
+            System.out.println("Boss defeated!");
+            PlayManager.bossAlive = false; // Set boss alive status to false
+        }
     }
 
     public void draw(Graphics2D g2) {

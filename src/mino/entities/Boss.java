@@ -3,6 +3,9 @@ package mino.entities;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import javax.imageio.ImageIO;
 import main.PlayManager;
 
@@ -10,9 +13,12 @@ public class Boss {
     public int x, y;
     public int speedX = 4; // Horizontal speed
     public int speedY = 2; // Vertical speed
-    private int health = 20;
+    private int health = 10;
     private BufferedImage sprite;
     private PlayManager playManager; // Reference to the PlayManager instance
+    private List<Projectile> projectiles = new ArrayList<>(); // List of boss projectiles
+    private int shootCooldown = 30; // Cooldown time in frames for shooting
+    private int shootTimer = 0; // Timer to track frames since the last shot
 
     public Boss(PlayManager playManager) {
         this.playManager = playManager; // Store the PlayManager reference
@@ -31,8 +37,6 @@ public class Boss {
 
     public void takeDamage(int damage) {
         health -= damage;
-        System.out.println("Boss health: " + health); // Debugging output
-
         if (health <= 0) {
             System.out.println("Boss defeated!");
             PlayManager.bossAlive = false; // Set boss alive status to false
@@ -63,6 +67,34 @@ public class Boss {
             y = playManager.MINO_START_Y - 128; // Prevent going out of bounds
             speedY = -speedY;
         }
+
+        // Update the shoot timer
+        if (shootTimer > 0) {
+            shootTimer--;
+        }
+
+        // Shoot a projectile if the cooldown is over
+        if (shootTimer == 0) {
+            shootProjectile();
+            shootTimer = shootCooldown; // Reset the cooldown timer
+        }
+
+        // Update all projectiles
+        for (int i = projectiles.size() - 1; i >= 0; i--) {
+            Projectile projectile = projectiles.get(i);
+            projectile.update();
+            if (!projectile.active) {
+                projectiles.remove(i); // Remove inactive projectiles
+            }
+        }
+    }
+
+    private void shootProjectile() {
+        Random random = new Random();
+        int projectileX = x + 64; // Center the projectile horizontally relative to the boss
+        int projectileY = y + 128; // Spawn below the boss
+        double angle = Math.toRadians(180 + random.nextInt(45) - 22.5); // Random angle between 157.5 and 202.5 degrees
+        projectiles.add(new Projectile(projectileX, projectileY, Math.toDegrees(angle), "boss"));
     }
 
     public void draw(Graphics2D g2) {
@@ -72,6 +104,11 @@ public class Boss {
             // Draw a placeholder rectangle if sprite is missing
             g2.setColor(java.awt.Color.RED);
             g2.fillRect(x, y, 128, 128);
+        }
+
+        // Draw projectiles
+        for (Projectile projectile : projectiles) {
+            projectile.draw(g2);
         }
     }
 }

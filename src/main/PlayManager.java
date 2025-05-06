@@ -47,7 +47,7 @@ public class PlayManager {
     int lines;
     int score;
 
-    CharModel cm;
+    public static CharModel cm;
 
     public static Boss boss;
     public static boolean bossSpawned = false;
@@ -141,7 +141,7 @@ public class PlayManager {
             boss = null; // Remove the boss instance
             bossSpawnTimer = 0; // Reset the spawn timer
             GamePanel.music.stop(); // Stop the boss music
-            GamePanel.music.play(1, false); // Play boss defeated sound
+            GamePanel.music.play(8, false); // Play boss defeated sound
             GamePanel.music.play(0, true); // Play normal music again
             GamePanel.music.loop();
         }
