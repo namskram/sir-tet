@@ -106,6 +106,19 @@ public class Boss {
             g2.fillRect(x, y, 128, 128);
         }
 
+        // Draw the boss's health bar
+        int healthBarWidth = 128; // Full width of the health bar
+        int healthBarHeight = 10; // Height of the health bar
+        int currentHealthWidth = (int) ((health / 10.0) * healthBarWidth); // Scale width based on health
+
+        // Draw the background of the health bar (gray)
+        g2.setColor(java.awt.Color.GRAY);
+        g2.fillRect(x, y - 15, healthBarWidth, healthBarHeight);
+
+        // Draw the current health (green)
+        g2.setColor(java.awt.Color.GREEN);
+        g2.fillRect(x, y - 15, currentHealthWidth, healthBarHeight);
+
         // Draw projectiles
         for (Projectile projectile : projectiles) {
             projectile.draw(g2);

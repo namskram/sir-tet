@@ -344,6 +344,19 @@ public class CharModel {
         }
         g2.drawImage(image, b[0].x-margin, b[0].y-margin, 64, 64, null);
 
+        // Draw the player's health bar
+        int healthBarWidth = 50; // Full width of the health bar
+        int healthBarHeight = 10; // Height of the health bar
+        int currentHealthWidth = (int) ((health / 10.0) * healthBarWidth); // Scale width based on health
+
+        // Draw the background of the health bar (gray)
+        g2.setColor(java.awt.Color.GRAY);
+        g2.fillRect(b[0].x - 10, b[0].y - 25, healthBarWidth, healthBarHeight);
+
+        // Draw the current health (green)
+        g2.setColor(java.awt.Color.GREEN);
+        g2.fillRect(b[0].x - 10, b[0].y - 25, currentHealthWidth, healthBarHeight);
+
         // Draw projectiles
         for (Projectile projectile : projectiles) {
             projectile.draw(g2);
