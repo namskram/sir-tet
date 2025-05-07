@@ -3,6 +3,9 @@ package mino.entities;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import main.PlayManager;
 import mino.Block;
 
@@ -15,12 +18,24 @@ public class Projectile {
     public boolean active = true; // Whether the projectile is still active
     private final double angle; // Angle of the projectile in degrees
     private final String source; // Source of the projectile ("player" or "boss")
+    private BufferedImage image; // Image for the projectile
 
     public Projectile(int x, int y, double angle, String source) {
         this.x = x;
         this.y = y;
         this.angle = Math.toRadians(angle); // Convert angle to radians
         this.source = source; // Set the source of the projectile
+
+        // Load the projectile image
+        try {
+            if (source.equals("player")) {
+                image = ImageIO.read(getClass().getResourceAsStream("/fireball.png"));
+            } else if (source.equals("boss")) {
+                image = ImageIO.read(getClass().getResourceAsStream("/fireball.png"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update() {
@@ -79,11 +94,14 @@ public class Projectile {
         g2.translate(x + width / 2, y + height / 2);
 
         // Rotate based on the angle
-        g2.rotate(angle);
+        g2.rotate(angle + Math.PI);
 
         // Draw the projectile as a rotated rectangle
-        g2.setColor(color);
-        g2.fillRect(-width / 2, -height / 2, width, height);
+        //g2.setColor(color);
+        //g2.fillRect(-width / 2, -height / 2, width, height);
+
+        // Draw the projectile image
+         g2.drawImage(image, -(width * 8) / 2, -(height * 2) / 2, width * 8, height * 2, null);
 
         // Restore the original transform
         g2.setTransform(originalTransform);
