@@ -27,7 +27,7 @@ public class CharModel {
     private float fallSpeed = Block.SIZE/4; // 4 -> 8
     private boolean inAir = false;
     private float above;
-    public List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
+    public final List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
     private double aimAngle = 0; // Current aiming angle in degrees
     private int shootCooldown = 10; // Limit rate of fire to 10 frames
     private int shootTimer = 0; // Timer to track frames since the last shot
@@ -249,11 +249,13 @@ public class CharModel {
         }
 
         // Update projectiles
-        for (int i = projectiles.size() - 1; i >= 0; i--) {
-            Projectile projectile = projectiles.get(i);
-            projectile.update();
-            if (!projectile.active) {
-                projectiles.remove(i); // Remove inactive projectiles
+        synchronized (projectiles) { // Synchronize access to the projectiles list
+            for (int i = projectiles.size() - 1; i >= 0; i--) {
+                Projectile projectile = projectiles.get(i);
+                projectile.update();
+                if (!projectile.active) {
+                    projectiles.remove(i); // Remove inactive projectiles
+                }
             }
         }
 
@@ -357,9 +359,11 @@ public class CharModel {
         g2.setColor(java.awt.Color.GREEN);
         g2.fillRect(b[0].x - 10, b[0].y - 25, currentHealthWidth, healthBarHeight);
 
-        // Draw projectiles
-        for (Projectile projectile : projectiles) {
-            projectile.draw(g2);
+        // Safely iterate over projectiles
+        synchronized (projectiles) { // Synchronize access to the projectiles list
+            for (Projectile projectile : projectiles) {
+                projectile.draw(g2);
+            }
         }
 
         // Draw the aiming angle indicator (optional)
