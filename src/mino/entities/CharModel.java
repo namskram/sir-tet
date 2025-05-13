@@ -353,11 +353,11 @@ public class CharModel {
 
         // Draw the background of the health bar (gray)
         g2.setColor(java.awt.Color.GRAY);
-        g2.fillRect(b[0].x - 10, b[0].y - 25, healthBarWidth, healthBarHeight);
+        g2.fillRect(b[0].x - 5, b[0].y - 25, healthBarWidth, healthBarHeight);
 
         // Draw the current health (green)
         g2.setColor(java.awt.Color.GREEN);
-        g2.fillRect(b[0].x - 10, b[0].y - 25, currentHealthWidth, healthBarHeight);
+        g2.fillRect(b[0].x - 5, b[0].y - 25, currentHealthWidth, healthBarHeight);
 
         // Safely iterate over projectiles
         synchronized (projectiles) { // Synchronize access to the projectiles list
@@ -366,12 +366,39 @@ public class CharModel {
             }
         }
 
-        // Draw the aiming angle indicator (optional)
-        g2.setColor(Color.RED);
-        int aimLineX = b[0].x + Block.SIZE / 2 + (int) (50 * Math.sin(Math.toRadians(aimAngle)));
-        int aimLineY = b[0].y - (int) (50 * Math.cos(Math.toRadians(aimAngle)));
-        g2.drawLine(b[0].x + Block.SIZE / 2, b[0].y, aimLineX, aimLineY);
+        /*
+        // Draw the aiming arrow (using arrow-diag.png)
+        try {
+            BufferedImage arrow = ImageIO.read(getClass().getResourceAsStream("/arrow.png"));
+            int arrowWidth = Block.SIZE * 4; // Adjust the size of the arrow
+            int arrowHeight = Block.SIZE * 2; // Adjust the size of the arrow
 
+            // Use the same starting position as projectiles
+            int arrowX = b[0].x + Block.SIZE / 2; // Center the arrow horizontally
+            int arrowY = b[0].y - Block.SIZE / 2; // Spawn above the player
+
+            // Calculate the rotation angle (adjusted for the arrow-diag.png orientation)
+            double rotation = Math.toRadians(aimAngle);
+
+            // Create a rotated version of the arrow
+            Graphics2D g2Rotated = (Graphics2D) g2.create();
+            g2Rotated.translate(arrowX, arrowY); // Translate to the arrow's position
+            g2Rotated.rotate(rotation); // Rotate the arrow
+            g2Rotated.drawImage(arrow, -arrowWidth / 2, -arrowHeight / 2, arrowWidth, arrowHeight, null);
+            g2Rotated.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+
+        
+        // Draw the aiming angle indicator (semi-transparent and smaller)
+        g2.setColor(new Color(255, 0, 0, 128)); // Red with 50% transparency (alpha = 128)
+        int aimLineLength = 40; // Smaller length for the aiming line
+        int aimLineX = b[0].x + Block.SIZE / 2 + (int) (aimLineLength * Math.sin(Math.toRadians(aimAngle)));
+        int aimLineY = b[0].y - (int) (aimLineLength * Math.cos(Math.toRadians(aimAngle)));
+        g2.drawLine(b[0].x + Block.SIZE / 2, b[0].y - 5, aimLineX, aimLineY);
+        
     }
     
 }
