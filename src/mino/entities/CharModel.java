@@ -27,6 +27,11 @@ public class CharModel {
     private float fallSpeed = Block.SIZE/4; // 4 -> 8
     private boolean inAir = false;
     private float above;
+    public final List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
+    private double aimAngle = 0; // Current aiming angle in degrees
+    private int shootCooldown = 10; // Limit rate of fire to 10 frames
+    private int shootTimer = 0; // Timer to track frames since the last shot
+    private int health = 10;
 
     public CharModel(Color c) {
         b[0] = new Block(c);
@@ -64,8 +69,8 @@ public class CharModel {
 
     public final void getCharModel() {
         try {
-            left = ImageIO.read(getClass().getResourceAsStream("/knight-left.png"));
-            right = ImageIO.read(getClass().getResourceAsStream("/knight-right.png"));
+            left = ImageIO.read(getClass().getResourceAsStream("/archer-left.png"));
+            right = ImageIO.read(getClass().getResourceAsStream("/archer-right.png"));
         } 
 
         catch (IOException e) {
@@ -243,6 +248,39 @@ public class CharModel {
             //b[0].y = PlayManager.bottom_y - Block.SIZE;
         }
 
+        // Update projectiles
+        synchronized (projectiles) { // Synchronize access to the projectiles list
+            for (int i = projectiles.size() - 1; i >= 0; i--) {
+                Projectile projectile = projectiles.get(i);
+                projectile.update();
+                if (!projectile.active) {
+                    projectiles.remove(i); // Remove inactive projectiles
+                }
+            }
+        }
+
+        // Adjust aiming angle with Q and E
+        if (KeyHandler.qPressed) {
+            aimAngle = Math.max(aimAngle - 4, -40); // Decrease angle, limit to -45 degrees
+            // KeyHandler.qPressed = false;
+        }
+        if (KeyHandler.ePressed) {
+            aimAngle = Math.min(aimAngle + 4, 40); // Increase angle, limit to 45 degrees
+            // KeyHandler.ePressed = false;
+        }
+
+        // Increment the shoot timer
+        if (shootTimer > 0) {
+            shootTimer--;
+        }
+
+        // Shoot a projectile when the spacebar is pressed
+        if (KeyHandler.spacePressed && shootTimer == 0) { // Use 'R' as an example key
+            shootProjectile();
+            shootTimer = shootCooldown;
+            // KeyHandler.spacePressed = false; // Prevent continuous shooting
+        }
+
         // Check if a falling block lands on the player
         Mino currentMino = PlayManager.currentMino;
         for (Block block : currentMino.b) {
@@ -283,8 +321,23 @@ public class CharModel {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    private void shootProjectile() {
+        // Spawn a projectile at the player's position
+        int projectileX = b[0].x + Block.SIZE / 4; // Center the projectile horizontally
+        int projectileY = b[0].y - Block.SIZE / 2; // Spawn above the player
+        projectiles.add(new Projectile(projectileX, projectileY, aimAngle, "player"));
+    }
 
+    public void takeDamage(int damage) {
+        health -= damage;
+        if (health <= 0) {
+            System.out.println("Boss defeated!");
+            PlayManager.bossAlive = false; // Set boss alive status to false
+        }
+    }
+
+    public void draw(Graphics2D g2) {
+        // Draw the character
         int margin = 16;
         BufferedImage image = null;
         switch (dir) {
@@ -293,6 +346,59 @@ public class CharModel {
         }
         g2.drawImage(image, b[0].x-margin, b[0].y-margin, 64, 64, null);
 
+        // Draw the player's health bar
+        int healthBarWidth = 50; // Full width of the health bar
+        int healthBarHeight = 10; // Height of the health bar
+        int currentHealthWidth = (int) ((health / 10.0) * healthBarWidth); // Scale width based on health
+
+        // Draw the background of the health bar (gray)
+        g2.setColor(java.awt.Color.GRAY);
+        g2.fillRect(b[0].x - 5, b[0].y - 25, healthBarWidth, healthBarHeight);
+
+        // Draw the current health (green)
+        g2.setColor(java.awt.Color.GREEN);
+        g2.fillRect(b[0].x - 5, b[0].y - 25, currentHealthWidth, healthBarHeight);
+
+        // Safely iterate over projectiles
+        synchronized (projectiles) { // Synchronize access to the projectiles list
+            for (Projectile projectile : projectiles) {
+                projectile.draw(g2);
+            }
+        }
+
+        /*
+        // Draw the aiming arrow (using arrow-diag.png)
+        try {
+            BufferedImage arrow = ImageIO.read(getClass().getResourceAsStream("/arrow.png"));
+            int arrowWidth = Block.SIZE * 4; // Adjust the size of the arrow
+            int arrowHeight = Block.SIZE * 2; // Adjust the size of the arrow
+
+            // Use the same starting position as projectiles
+            int arrowX = b[0].x + Block.SIZE / 2; // Center the arrow horizontally
+            int arrowY = b[0].y - Block.SIZE / 2; // Spawn above the player
+
+            // Calculate the rotation angle (adjusted for the arrow-diag.png orientation)
+            double rotation = Math.toRadians(aimAngle);
+
+            // Create a rotated version of the arrow
+            Graphics2D g2Rotated = (Graphics2D) g2.create();
+            g2Rotated.translate(arrowX, arrowY); // Translate to the arrow's position
+            g2Rotated.rotate(rotation); // Rotate the arrow
+            g2Rotated.drawImage(arrow, -arrowWidth / 2, -arrowHeight / 2, arrowWidth, arrowHeight, null);
+            g2Rotated.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+
+        
+        // Draw the aiming angle indicator (semi-transparent and smaller)
+        g2.setColor(new Color(255, 0, 0, 128)); // Red with 50% transparency (alpha = 128)
+        int aimLineLength = 40; // Smaller length for the aiming line
+        int aimLineX = b[0].x + Block.SIZE / 2 + (int) (aimLineLength * Math.sin(Math.toRadians(aimAngle)));
+        int aimLineY = b[0].y - (int) (aimLineLength * Math.cos(Math.toRadians(aimAngle)));
+        g2.drawLine(b[0].x + Block.SIZE / 2, b[0].y - 5, aimLineX, aimLineY);
+        
     }
     
 }

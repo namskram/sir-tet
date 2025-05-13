@@ -47,13 +47,14 @@ public class PlayManager {
     int lines;
     int score;
 
-    CharModel cm;
+    public static CharModel cm;
 
-    private Boss boss;
-    private boolean bossSpawned = false;
-    private int bossSpawnTimer = 0; // Timer to track when to spawn the boss
-    private boolean fadingIn;
-    private float bossMusicVolume = -80.0f;
+    public static Boss boss;
+    public static boolean bossSpawned = false;
+    public static int bossSpawnTimer = 0; // Timer to track when to spawn the boss
+    public static boolean bossAlive = false;
+    // private boolean fadingIn;
+    // private float bossMusicVolume = -80.0f;
 
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
@@ -97,12 +98,13 @@ public class PlayManager {
             return;
         }
         if (!bossSpawned) {
+            bossAlive = true;
             bossSpawnTimer++;
 
             // Play the "boss incoming" sound 5 seconds before the boss spawns
             if (bossSpawnTimer == 210) { // 7 seconds at 30 FPS
                 GamePanel.music.stop(); // Stop any current music
-                GamePanel.music.play(7, false); // Play "utsuho incoming.wav"
+                GamePanel.music.play(7, false); // Play boss music
             }
 
             if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
@@ -133,6 +135,16 @@ public class PlayManager {
         if (bossSpawned && boss != null) {
             boss.update();
         }
+
+        if (!bossAlive) {
+            bossSpawned = false; // Reset the spawn flag
+            boss = null; // Remove the boss instance
+            bossSpawnTimer = 0; // Reset the spawn timer
+            GamePanel.music.stop(); // Stop the boss music
+            GamePanel.music.play(8, false); // Play boss defeated sound
+            GamePanel.music.play(0, true); // Play normal music again
+            GamePanel.music.loop();
+        }
     
         if (currentMino.active == false) {
             staticBlocks.add(currentMino.b[0]);
@@ -155,7 +167,9 @@ public class PlayManager {
             nextMino.setXY(NEXTMINO_X, NEXTMINO_Y);
     
             checkDelete();
-        } else {
+        } 
+        
+        else {
             currentMino.update();
             cm.update();
         }

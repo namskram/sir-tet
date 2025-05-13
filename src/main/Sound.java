@@ -23,6 +23,7 @@ public class Sound {
         url[5] = getClass().getResource("/tetris-active.wav");
         url[6] = getClass().getResource("/marunouchi survivor.wav");
         url[7] = getClass().getResource("/utsuho incoming.wav");
+        url[8] = getClass().getResource("/dragon defeated.wav");
     }
 
     public void play(int i, boolean music) {
