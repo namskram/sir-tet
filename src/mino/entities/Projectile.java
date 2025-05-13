@@ -23,7 +23,7 @@ public class Projectile {
 
     static {
         try {
-            playerProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/blast-2.png"));
+            playerProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/arrow-diag.png"));
             bossProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/fireball.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,7 +101,7 @@ public class Projectile {
 
         // Rotate based on the angle and source
         if (source.equals("player")) {
-            g2.rotate(angle);
+            g2.rotate(angle - Math.PI / 4);
         } 
         
         else if (source.equals("boss")) {
