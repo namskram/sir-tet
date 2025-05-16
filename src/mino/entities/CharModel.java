@@ -325,15 +325,20 @@ public class CharModel {
         // Spawn a projectile at the player's position
         int projectileX = b[0].x + Block.SIZE / 4; // Center the projectile horizontally
         int projectileY = b[0].y - Block.SIZE / 2; // Spawn above the player
-        projectiles.add(new Projectile(projectileX, projectileY, aimAngle, "player"));
+        projectiles.add(new Projectile(projectileX, projectileY, aimAngle, "player", PlayManager.playerDamage));
     }
 
     public void takeDamage(int damage) {
         health -= damage;
+        System.out.println("Player takes " + damage + " damage! Player HP: " + health);
         if (health <= 0) {
             System.out.println("Boss defeated!");
             PlayManager.bossAlive = false; // Set boss alive status to false
         }
+    }
+
+    public void heal(int amount) {
+        health = Math.min(health + amount, 10); // 10 is max HP, adjust if needed
     }
 
     public void draw(Graphics2D g2) {
@@ -390,7 +395,6 @@ public class CharModel {
             e.printStackTrace();
         }
         */
-
         
         // Draw the aiming angle indicator (semi-transparent and smaller)
         g2.setColor(new Color(255, 0, 0, 128)); // Red with 50% transparency (alpha = 128)

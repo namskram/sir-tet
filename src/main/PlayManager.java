@@ -48,6 +48,7 @@ public class PlayManager {
     int score;
 
     public static CharModel cm;
+    public static int playerDamage = 1;
 
     public static Boss boss;
     public static boolean bossSpawned = false;
@@ -232,6 +233,9 @@ public class PlayManager {
             GamePanel.se.play(1, false);
             int singleLineScore = 10 * level;
             score += singleLineScore * lineCount;
+            playerDamage += lineCount; // Increase player damage by lines cleared
+
+            cm.heal(lineCount); // Heal the character by lines cleared
         }
     }
 

@@ -11,6 +11,7 @@ import mino.Block;
 
 public class Projectile {
     public int x, y;
+    public int damage;
     private final int speed = Block.SIZE / 1; // Speed of the projectile
     private final int width = Block.SIZE / 4; // Width of the projectile
     private final int height = Block.SIZE; // Height of the projectile
@@ -30,11 +31,12 @@ public class Projectile {
         }
     }
 
-    public Projectile(int x, int y, double angle, String source) {
+    public Projectile(int x, int y, double angle, String source, int damage) {
         this.x = x;
         this.y = y;
         this.angle = Math.toRadians(angle); // Convert angle to radians
         this.source = source; // Set the source of the projectile
+        this.damage = damage;
 
         // Use cached images
         if (source.equals("player")) {
@@ -73,7 +75,7 @@ public class Projectile {
             if (x < PlayManager.boss.x + 128 && x + width > PlayManager.boss.x && // Horizontal overlap
                 y < PlayManager.boss.y + 128 && y + height > PlayManager.boss.y) { // Vertical overlap
                 active = false; // Deactivate the projectile
-                PlayManager.boss.takeDamage(1); // Damage the boss
+                PlayManager.boss.takeDamage(damage); // Damage the boss
             }
         }
 
@@ -82,7 +84,7 @@ public class Projectile {
             if (x < PlayManager.cm.b[0].x + Block.SIZE && x + width > PlayManager.cm.b[0].x && // Horizontal overlap
                 y < PlayManager.cm.b[0].y + Block.SIZE && y + height > PlayManager.cm.b[0].y) { // Vertical overlap
                 active = false; // Deactivate the projectile
-                PlayManager.cm.takeDamage(1); // Damage the player (implement `takeDamage` in CharModel)
+                PlayManager.cm.takeDamage(damage); // Damage the player (implement `takeDamage` in CharModel)
             }
         }
 
