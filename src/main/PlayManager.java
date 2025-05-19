@@ -54,6 +54,10 @@ public class PlayManager {
     public static boolean bossSpawned = false;
     public static int bossSpawnTimer = 0; // Timer to track when to spawn the boss
     public static boolean bossAlive = false;
+    public boolean bossIncoming = false;
+    private int bossIncomingFlashCount = 0;
+    private int bossIncomingFlashTimer = 0;
+    private boolean bossIncomingVisible = true;
     // private boolean fadingIn;
     // private float bossMusicVolume = -80.0f;
 
@@ -106,6 +110,10 @@ public class PlayManager {
             if (bossSpawnTimer == 210) { // 7 seconds at 30 FPS
                 GamePanel.music.stop(); // Stop any current music
                 GamePanel.music.play(7, false); // Play boss music
+                bossIncoming = true; // Show "BOSS INCOMING" text
+                bossIncomingFlashCount = 0;
+                bossIncomingFlashTimer = 0;
+                bossIncomingVisible = true;
             }
 
             if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
@@ -116,7 +124,24 @@ public class PlayManager {
                 GamePanel.music.play(6, true); // Play boss music
                 GamePanel.music.setVolume(-20.0f); // Set the volume for the boss music
                 GamePanel.music.loop();
+                bossIncoming = false; // Hide "BOSS INCOMING" text
                 //fadingIn = true;
+            }
+        }
+
+        if (bossIncoming) {
+            bossIncomingFlashTimer++;
+            if (bossIncomingFlashTimer >= 18) { // Toggle every 15 frames (~0.5s at 30 FPS)
+                bossIncomingVisible = !bossIncomingVisible;
+                bossIncomingFlashTimer = 0;
+                if (!bossIncomingVisible) {
+                    bossIncomingFlashCount++;
+                }
+                if (bossIncomingFlashCount >= 3) { // Flash 3 times
+                    bossIncoming = false;
+                    bossIncomingFlashCount = 0;
+                    bossIncomingVisible = true;
+                }
             }
         }
         /*
@@ -280,6 +305,15 @@ public class PlayManager {
         // Draw all static blocks
         for (int i = 0; i < staticBlocks.size(); i++) {
             staticBlocks.get(i).draw(g2);
+        }
+
+        if (bossIncoming && bossIncomingVisible) {
+            g2.setColor(Color.YELLOW);
+            g2.setFont(new Font("Arial", Font.BOLD, 36));
+            int textWidth = g2.getFontMetrics().stringWidth("BOSS INCOMING");
+            x = (GamePanel.WIDTH - textWidth) / 2;
+            y = GamePanel.HEIGHT / 2;
+            g2.drawString("BOSS INCOMING", x, y);
         }
 
         // Draw the boss if spawned
