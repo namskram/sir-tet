@@ -20,11 +20,13 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_ESCAPE) {
             if (pausePressed) {
                 pausePressed = false;
-                GamePanel.music.play(0, true);
-                GamePanel.music.loop();
+                GamePanel.music.resume();
+                //GamePanel.music.play(0, true);
+                //GamePanel.music.loop();
             } else {
                 pausePressed = true;
-                GamePanel.music.stop();
+                GamePanel.music.pause();
+                //GamePanel.music.stop();
             }
         }
 
