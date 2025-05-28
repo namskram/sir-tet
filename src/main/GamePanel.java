@@ -76,6 +76,13 @@ public class GamePanel extends JPanel implements Runnable {
         KeyHandler.pausePressed = false; // Ensure the game is not paused
         staticBlocks.clear(); // Clear all static blocks
 
+        // Reset boss state
+        pm.bossSpawned = false;
+        pm.bossAlive = false;
+        pm.boss = null;
+        pm.bossSpawnTimer = 0;
+        pm.bossIncoming = false;
+
         // Reset the character model position
         pm.cm.setXY(PlayManager.left_x + (pm.WIDTH / 2), PlayManager.bottom_y - Block.SIZE);
 
