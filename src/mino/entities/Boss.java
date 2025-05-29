@@ -16,6 +16,8 @@ public class Boss {
     private int health;
     private int maxHealth;
     private int projectileDamage;
+    private BufferedImage spriteRight;
+    private BufferedImage spriteLeft;
     private BufferedImage sprite;
     private PlayManager playManager; // Reference to the PlayManager instance
     private List<Projectile> projectiles = new ArrayList<>(); // List of boss projectiles
@@ -39,7 +41,9 @@ public class Boss {
 
         // Load placeholder sprite
         try {
-            sprite = ImageIO.read(getClass().getResourceAsStream("/dragon-right.png"));
+            spriteRight = ImageIO.read(getClass().getResourceAsStream("/res/dragon-right.png"));
+            spriteLeft = ImageIO.read(getClass().getResourceAsStream("/res/dragon-left.png"));
+            sprite = spriteRight; // Default to right
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,6 +70,12 @@ public class Boss {
         } else if (x >= PlayManager.right_x - 128) { // Assuming boss sprite width is 128
             x = PlayManager.right_x - 128; // Prevent going out of bounds
             speedX = -speedX;
+        }
+
+        if (speedX > 0) {
+            sprite = spriteRight;
+        } else if (speedX < 0) {
+            sprite = spriteLeft;
         }
 
         // Move the boss up and down

@@ -69,8 +69,8 @@ public class CharModel {
 
     public final void getCharModel() {
         try {
-            left = ImageIO.read(getClass().getResourceAsStream("/archer-left.png"));
-            right = ImageIO.read(getClass().getResourceAsStream("/archer-right.png"));
+            left = ImageIO.read(getClass().getResourceAsStream("/res/archer-left.png"));
+            right = ImageIO.read(getClass().getResourceAsStream("/res/archer-right.png"));
         } 
 
         catch (IOException e) {

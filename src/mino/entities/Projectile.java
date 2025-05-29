@@ -24,8 +24,8 @@ public class Projectile {
 
     static {
         try {
-            playerProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/arrow-diag.png"));
-            bossProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/fireball.png"));
+            playerProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/res/arrow-diag.png"));
+            bossProjectileImage = ImageIO.read(Projectile.class.getResourceAsStream("/res/fireball.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
