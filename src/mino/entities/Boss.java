@@ -5,9 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.imageio.ImageIO;
 import main.PlayManager;
+import mino.Block;
 
 public class Boss {
     public int x, y;
@@ -49,7 +49,7 @@ public class Boss {
         health -= damage;
         // System.out.println("Boss takes " + damage + " damage! Boss HP: " + health);
         if (health <= 0) {
-            System.out.println("Boss defeated!");
+            // System.out.println("Boss defeated!");
             PlayManager.bossAlive = false; // Set boss alive status to false
             bossLevel++;
         }
@@ -103,11 +103,23 @@ public class Boss {
 
     // When shooting, pass projectileDamage to the Projectile constructor
     private void shootProjectile() {
-        Random random = new Random();
-        int projectileX = x + 64;
-        int projectileY = y + 128;
-        double angle = Math.toRadians(180 + random.nextInt(45) - 22.5);
-        projectiles.add(new Projectile(projectileX, projectileY, Math.toDegrees(angle), "boss", projectileDamage));
+        // Get the center of the boss
+        int bossCenterX = x + 64;
+        int bossCenterY = y + 64;
+
+        // Get the center of the player
+        int playerCenterX = PlayManager.cm.b[0].x + Block.SIZE / 2;
+        int playerCenterY = PlayManager.cm.b[0].y + Block.SIZE / 2;
+
+        // Calculate the angle from the boss to the player
+        double angleRad = Math.atan2(playerCenterY - bossCenterY, playerCenterX - bossCenterX);
+        double angleDeg = Math.toDegrees(angleRad) + 90;
+
+        // Spawn the projectile at the center of the boss
+        int projectileX = bossCenterX;
+        int projectileY = bossCenterY;
+
+        projectiles.add(new Projectile(projectileX, projectileY, angleDeg, "boss", projectileDamage));
     }
 
     public void draw(Graphics2D g2) {

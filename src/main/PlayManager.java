@@ -106,9 +106,9 @@ public class PlayManager {
             bossAlive = true;
             bossSpawnTimer++;
 
-            // Play the "boss incoming" sound 5 seconds before the boss spawns
-            if (bossSpawnTimer == 210) { // 7 seconds at 30 FPS
-                GamePanel.music.stop(); // Stop any current music
+            // Play the "boss incoming" sound 3 seconds before the boss spawns
+            if (bossSpawnTimer == 510) { // 17 seconds at 30 FPS
+                GamePanel.music.pause(); // Stop any current music
                 GamePanel.music.play(7, false); // Play boss music
                 bossIncoming = true; // Show "BOSS INCOMING" text
                 bossIncomingFlashCount = 0;
@@ -116,14 +116,13 @@ public class PlayManager {
                 bossIncomingVisible = true;
             }
 
-            if (bossSpawnTimer >= 300) { // 10 seconds at 30 FPS
+            if (bossSpawnTimer >= 600) { // 20 seconds at 30 FPS
                 boss = new Boss(this);
                 bossSpawned = true;
 
-                GamePanel.music.stop();
-                GamePanel.music.play(6, true); // Play boss music
-                GamePanel.music.setVolume(-20.0f); // Set the volume for the boss music
-                GamePanel.music.loop();
+                GamePanel.bossMusic.play(6, true); // Play boss music
+                GamePanel.bossMusic.setVolume(-20.0f); // Set the volume for the boss music
+                GamePanel.bossMusic.loop();
                 bossIncoming = false; // Hide "BOSS INCOMING" text
                 //fadingIn = true;
             }
@@ -166,9 +165,9 @@ public class PlayManager {
             bossSpawned = false; // Reset the spawn flag
             boss = null; // Remove the boss instance
             bossSpawnTimer = 0; // Reset the spawn timer
-            GamePanel.music.stop(); // Stop the boss music
+            GamePanel.bossMusic.stop(); // Stop the boss music
             GamePanel.music.play(8, false); // Play boss defeated sound
-            GamePanel.music.play(0, true); // Play normal music again
+            GamePanel.music.resume(); // Play normal music again
             GamePanel.music.loop();
         }
     

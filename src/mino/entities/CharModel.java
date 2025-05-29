@@ -330,10 +330,12 @@ public class CharModel {
 
     public void takeDamage(int damage) {
         health -= damage;
-        System.out.println("Player takes " + damage + " damage! Player HP: " + health);
+        // System.out.println("Player takes " + damage + " damage! Player HP: " + health);
         if (health <= 0) {
-            System.out.println("Boss defeated!");
-            PlayManager.bossAlive = false; // Set boss alive status to false
+            // System.out.println("Player defeated!");
+            GamePanel.gameOver = true;
+            GamePanel.bossMusic.stop();
+            GamePanel.music.play(2, false);
         }
     }
 

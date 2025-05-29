@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     PlayManager pm;
     public static Sound music = new Sound();
+    public static Sound bossMusic = new Sound();
     public static Sound se = new Sound();
     public static boolean gameOver = false;
 
@@ -88,6 +89,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Reset the music
         music.stop();
+        bossMusic.stop();
         music.play(0, true);
         music.loop();
     }
