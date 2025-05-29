@@ -39,11 +39,14 @@ public class Sound {
             }
 
             clip.open(ais);
-            clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) {
-                    clip.close();
-                }
-            });
+            // Only close the clip for sound effects, not for music
+            if (!music) {
+                clip.addLineListener(event -> {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        clip.close();
+                    }
+                });
+            }
 
             activeClips.add(clip); // Track this clip
             ais.close();
@@ -83,4 +86,16 @@ public class Sound {
             volume.setValue(value);
         }
     }   
+
+    public void pause() {
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop(); // Pauses the music at the current position
+        }
+    }
+
+    public void resume() {
+        if (musicClip != null && !musicClip.isRunning()) {
+            musicClip.start(); // Resumes from where it was paused
+        }
+    }
 }

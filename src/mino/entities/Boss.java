@@ -5,20 +5,26 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.imageio.ImageIO;
 import main.PlayManager;
+import mino.Block;
 
 public class Boss {
     public int x, y;
     public int speedX = 4; // Horizontal speed
     public int speedY = 2; // Vertical speed
-    private int health = 10;
+    private int health;
+    private int maxHealth;
+    private int projectileDamage;
     private BufferedImage sprite;
     private PlayManager playManager; // Reference to the PlayManager instance
     private List<Projectile> projectiles = new ArrayList<>(); // List of boss projectiles
     private int shootCooldown = 30; // Cooldown time in frames for shooting
     private int shootTimer = 0; // Timer to track frames since the last shot
+
+    public static int bossLevel = 1;
+    public static int baseHP = 10;
+    public static int baseProjectileDamage = 1;
 
     public Boss(PlayManager playManager) {
         this.playManager = playManager; // Store the PlayManager reference
@@ -26,6 +32,10 @@ public class Boss {
         // Initial position (centered horizontally within the Tetris box)
         x = PlayManager.left_x + (playManager.WIDTH / 2) - 64; // Center horizontally
         y = PlayManager.top_y + 32; // Spawn near the top of the Tetris box
+
+        maxHealth = baseHP + (bossLevel - 1) * 5; // Example: +5 HP per level
+        health = maxHealth; // Set initial health
+        projectileDamage = baseProjectileDamage + (bossLevel - 1); // Example: +1 damage per level
 
         // Load placeholder sprite
         try {
@@ -37,9 +47,11 @@ public class Boss {
 
     public void takeDamage(int damage) {
         health -= damage;
+        // System.out.println("Boss takes " + damage + " damage! Boss HP: " + health);
         if (health <= 0) {
-            System.out.println("Boss defeated!");
+            // System.out.println("Boss defeated!");
             PlayManager.bossAlive = false; // Set boss alive status to false
+            bossLevel++;
         }
     }
 
@@ -89,12 +101,25 @@ public class Boss {
         }
     }
 
+    // When shooting, pass projectileDamage to the Projectile constructor
     private void shootProjectile() {
-        Random random = new Random();
-        int projectileX = x + 64; // Center the projectile horizontally relative to the boss
-        int projectileY = y + 128; // Spawn below the boss
-        double angle = Math.toRadians(180 + random.nextInt(45) - 22.5); // Random angle between 157.5 and 202.5 degrees
-        projectiles.add(new Projectile(projectileX, projectileY, Math.toDegrees(angle), "boss"));
+        // Get the center of the boss
+        int bossCenterX = x + 64;
+        int bossCenterY = y + 64;
+
+        // Get the center of the player
+        int playerCenterX = PlayManager.cm.b[0].x + Block.SIZE / 2;
+        int playerCenterY = PlayManager.cm.b[0].y + Block.SIZE / 2;
+
+        // Calculate the angle from the boss to the player
+        double angleRad = Math.atan2(playerCenterY - bossCenterY, playerCenterX - bossCenterX);
+        double angleDeg = Math.toDegrees(angleRad) + 90;
+
+        // Spawn the projectile at the center of the boss
+        int projectileX = bossCenterX;
+        int projectileY = bossCenterY;
+
+        projectiles.add(new Projectile(projectileX, projectileY, angleDeg, "boss", projectileDamage));
     }
 
     public void draw(Graphics2D g2) {
@@ -109,7 +134,7 @@ public class Boss {
         // Draw the boss's health bar
         int healthBarWidth = 128; // Full width of the health bar
         int healthBarHeight = 10; // Height of the health bar
-        int currentHealthWidth = (int) ((health / 10.0) * healthBarWidth); // Scale width based on health
+        int currentHealthWidth = (int) ((health / (double) maxHealth) * healthBarWidth); // Scale width based on health
 
         // Draw the background of the health bar (gray)
         g2.setColor(java.awt.Color.GRAY);

@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     PlayManager pm;
     public static Sound music = new Sound();
+    public static Sound bossMusic = new Sound();
     public static Sound se = new Sound();
     public static boolean gameOver = false;
 
@@ -76,11 +77,19 @@ public class GamePanel extends JPanel implements Runnable {
         KeyHandler.pausePressed = false; // Ensure the game is not paused
         staticBlocks.clear(); // Clear all static blocks
 
+        // Reset boss state
+        pm.bossSpawned = false;
+        pm.bossAlive = false;
+        pm.boss = null;
+        pm.bossSpawnTimer = 0;
+        pm.bossIncoming = false;
+
         // Reset the character model position
         pm.cm.setXY(PlayManager.left_x + (pm.WIDTH / 2), PlayManager.bottom_y - Block.SIZE);
 
         // Reset the music
         music.stop();
+        bossMusic.stop();
         music.play(0, true);
         music.loop();
     }
