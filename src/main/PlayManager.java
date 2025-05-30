@@ -58,6 +58,8 @@ public class PlayManager {
     private int bossIncomingFlashCount = 0;
     private int bossIncomingFlashTimer = 0;
     private boolean bossIncomingVisible = true;
+    private int nextBossSpawnTime = 600; // Time in frames to wait before the next boss spawn
+    private final Random random = new Random();
     // private boolean fadingIn;
     // private float bossMusicVolume = -80.0f;
 
@@ -107,7 +109,7 @@ public class PlayManager {
             bossSpawnTimer++;
 
             // Play the "boss incoming" sound 3 seconds before the boss spawns
-            if (bossSpawnTimer == 510) { // 17 seconds at 30 FPS
+            if (bossSpawnTimer == nextBossSpawnTime - 90) { // 17 seconds at 30 FPS
                 GamePanel.music.pause(); // Stop any current music
                 GamePanel.music.play(7, false); // Play boss music
                 bossIncoming = true; // Show "BOSS INCOMING" text
@@ -116,7 +118,7 @@ public class PlayManager {
                 bossIncomingVisible = true;
             }
 
-            if (bossSpawnTimer >= 600) { // 20 seconds at 30 FPS
+            if (bossSpawnTimer >= nextBossSpawnTime) { // 20 seconds at 30 FPS
                 boss = new Boss(this);
                 bossSpawned = true;
 
@@ -165,6 +167,7 @@ public class PlayManager {
             bossSpawned = false; // Reset the spawn flag
             boss = null; // Remove the boss instance
             bossSpawnTimer = 0; // Reset the spawn timer
+            nextBossSpawnTime = 600 + random.nextInt(301); // 600 to 900 (20s to 30s at 30 FPS)
             GamePanel.bossMusic.stop(); // Stop the boss music
             GamePanel.music.play(8, false); // Play boss defeated sound
             GamePanel.music.resume(); // Play normal music again
