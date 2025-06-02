@@ -363,11 +363,40 @@ public class PlayManager {
             g2.drawString("Press R to Restart", x, y + 50);
         }
 
-        // Draw the title
-        x = 35;
-        y = top_y + 320;
+        // Draw the title at the top left
+        x = 50;
+        y = 100;
         g2.setColor(Color.white);
         g2.setFont(new Font("Times New Roman", Font.ITALIC, 60));
-        g2.drawString("Sir Tet", x + 100, y);
+        g2.drawString("Sir Tet", x + 70, y);
+
+        // Draw controls box under the title
+        int boxX = x;
+        int boxY = y + 50;
+        int boxWidth = 350;
+        int boxHeight = 250;
+
+        g2.setColor(new Color(30, 30, 30, 220)); // semi-transparent dark background
+        g2.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+        g2.setColor(Color.white);
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+
+        g2.setFont(new Font("Arial", Font.PLAIN, 24));
+        int textY = boxY + 40;
+        g2.drawString("Controls:", boxX + 30, textY);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+        textY += 30;
+        g2.drawString("← → ↓ : Move block", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("↑ or : Rotate block", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("SPACE : Shoot arrow", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("WASD : Move character", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("Q/E : Aim bow", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("ESC : Pause", boxX + 30, textY);
     }
 }
