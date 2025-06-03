@@ -12,18 +12,18 @@ public class Sound {
     FloatControl volume;
 
     public Sound() {
-        url[0] = getClass().getResource("/tetoris-active.wav");
+        url[0] = getClass().getResource("/res/tetoris-active.wav");
         if (url[0] == null) {
-            throw new RuntimeException("Resource not found: /tetoris-active.wav");
+            throw new RuntimeException("Resource not found: /res/tetoris-active.wav");
         }
-        url[1] = getClass().getResource("/delete line.wav");
-        url[2] = getClass().getResource("/gameover.wav");
-        url[3] = getClass().getResource("/rotation.wav");
-        url[4] = getClass().getResource("/touch floor.wav");
-        url[5] = getClass().getResource("/tetris-active.wav");
-        url[6] = getClass().getResource("/marunouchi survivor.wav");
-        url[7] = getClass().getResource("/utsuho incoming.wav");
-        url[8] = getClass().getResource("/dragon defeated.wav");
+        url[1] = getClass().getResource("/res/delete line.wav");
+        url[2] = getClass().getResource("/res/gameover.wav");
+        url[3] = getClass().getResource("/res/rotation.wav");
+        url[4] = getClass().getResource("/res/touch floor.wav");
+        url[5] = getClass().getResource("/res/tetris-active.wav");
+        url[6] = getClass().getResource("/res/marunouchi survivor.wav");
+        url[7] = getClass().getResource("/res/utsuho incoming.wav");
+        url[8] = getClass().getResource("/res/dragon defeated.wav");
     }
 
     public void play(int i, boolean music) {

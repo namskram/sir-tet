@@ -16,6 +16,8 @@ public class Boss {
     private int health;
     private int maxHealth;
     private int projectileDamage;
+    private BufferedImage spriteRight;
+    private BufferedImage spriteLeft;
     private BufferedImage sprite;
     private PlayManager playManager; // Reference to the PlayManager instance
     private List<Projectile> projectiles = new ArrayList<>(); // List of boss projectiles
@@ -39,7 +41,9 @@ public class Boss {
 
         // Load placeholder sprite
         try {
-            sprite = ImageIO.read(getClass().getResourceAsStream("/dragon-right.png"));
+            spriteRight = ImageIO.read(getClass().getResourceAsStream("/res/dragon-right.png"));
+            spriteLeft = ImageIO.read(getClass().getResourceAsStream("/res/dragon-left.png"));
+            sprite = spriteRight; // Default to right
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,6 +55,7 @@ public class Boss {
         if (health <= 0) {
             // System.out.println("Boss defeated!");
             PlayManager.bossAlive = false; // Set boss alive status to false
+            playManager.score += 500; // Add score for defeating the boss
             bossLevel++;
         }
     }
@@ -66,6 +71,12 @@ public class Boss {
         } else if (x >= PlayManager.right_x - 128) { // Assuming boss sprite width is 128
             x = PlayManager.right_x - 128; // Prevent going out of bounds
             speedX = -speedX;
+        }
+
+        if (speedX > 0) {
+            sprite = spriteRight;
+        } else if (speedX < 0) {
+            sprite = spriteLeft;
         }
 
         // Move the boss up and down
@@ -132,8 +143,8 @@ public class Boss {
         }
 
         // Draw the boss's health bar
-        int healthBarWidth = 128; // Full width of the health bar
-        int healthBarHeight = 10; // Height of the health bar
+        int healthBarWidth = 128;
+        int healthBarHeight = 10;
         int currentHealthWidth = (int) ((health / (double) maxHealth) * healthBarWidth); // Scale width based on health
 
         // Draw the background of the health bar (gray)

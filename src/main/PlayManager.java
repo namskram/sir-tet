@@ -45,7 +45,7 @@ public class PlayManager {
 
     int level = 1;
     int lines;
-    int score;
+    public int score;
 
     public static CharModel cm;
     public static int playerDamage = 1;
@@ -58,8 +58,8 @@ public class PlayManager {
     private int bossIncomingFlashCount = 0;
     private int bossIncomingFlashTimer = 0;
     private boolean bossIncomingVisible = true;
-    // private boolean fadingIn;
-    // private float bossMusicVolume = -80.0f;
+    private int nextBossSpawnTime = 600; // Time in frames to wait before the next boss spawn
+    private final Random random = new Random();
 
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
@@ -107,7 +107,7 @@ public class PlayManager {
             bossSpawnTimer++;
 
             // Play the "boss incoming" sound 3 seconds before the boss spawns
-            if (bossSpawnTimer == 510) { // 17 seconds at 30 FPS
+            if (bossSpawnTimer == nextBossSpawnTime - 90) { // 17 seconds at 30 FPS
                 GamePanel.music.pause(); // Stop any current music
                 GamePanel.music.play(7, false); // Play boss music
                 bossIncoming = true; // Show "BOSS INCOMING" text
@@ -116,7 +116,7 @@ public class PlayManager {
                 bossIncomingVisible = true;
             }
 
-            if (bossSpawnTimer >= 600) { // 20 seconds at 30 FPS
+            if (bossSpawnTimer >= nextBossSpawnTime) { // 20 seconds at 30 FPS
                 boss = new Boss(this);
                 bossSpawned = true;
 
@@ -124,7 +124,6 @@ public class PlayManager {
                 GamePanel.bossMusic.setVolume(-20.0f); // Set the volume for the boss music
                 GamePanel.bossMusic.loop();
                 bossIncoming = false; // Hide "BOSS INCOMING" text
-                //fadingIn = true;
             }
         }
 
@@ -143,19 +142,6 @@ public class PlayManager {
                 }
             }
         }
-        /*
-
-        if (fadingIn) {
-            if (bossMusicVolume < 0.0f) {
-                bossMusicVolume += 2.0f; 
-                GamePanel.music.setVolume(bossMusicVolume);
-                System.out.println("Fading in: Volume = " + bossMusicVolume);
-            } else {
-                fadingIn = false; 
-                System.out.println("Fade-in complete: Volume = " + bossMusicVolume);
-            }
-        }
-        */
     
         if (bossSpawned && boss != null) {
             boss.update();
@@ -165,6 +151,7 @@ public class PlayManager {
             bossSpawned = false; // Reset the spawn flag
             boss = null; // Remove the boss instance
             bossSpawnTimer = 0; // Reset the spawn timer
+            nextBossSpawnTime = 600 + random.nextInt(301); // 600 to 900 (20s to 30s at 30 FPS)
             GamePanel.bossMusic.stop(); // Stop the boss music
             GamePanel.music.play(8, false); // Play boss defeated sound
             GamePanel.music.resume(); // Play normal music again
@@ -270,9 +257,9 @@ public class PlayManager {
         g2.drawRect(left_x - 4, top_y - 4, WIDTH + 8, HEIGHT + 8);
 
         // Draw the game over line
-        g2.setColor(Color.red); // Use red to make it stand out
-        g2.setStroke(new BasicStroke(2f)); // Thinner line for the game over line
-        g2.drawLine(left_x, top_y + (Block.SIZE*4), right_x, top_y + (Block.SIZE*4)); // Horizontal line at the top_y position
+        g2.setColor(Color.red);
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawLine(left_x, top_y + (Block.SIZE*4), right_x, top_y + (Block.SIZE*4));
 
         // Draw the "NEXT" box and other UI elements
         int x = right_x + 100;
@@ -360,11 +347,40 @@ public class PlayManager {
             g2.drawString("Press R to Restart", x, y + 50);
         }
 
-        // Draw the title
-        x = 35;
-        y = top_y + 320;
+        // Draw the title at the top left
+        x = 50;
+        y = 100;
         g2.setColor(Color.white);
         g2.setFont(new Font("Times New Roman", Font.ITALIC, 60));
-        g2.drawString("Sir Tet", x + 100, y);
+        g2.drawString("Sir Tet", x + 70, y);
+
+        // Draw controls box under the title
+        int boxX = x;
+        int boxY = y + 50;
+        int boxWidth = 350;
+        int boxHeight = 250;
+
+        g2.setColor(new Color(30, 30, 30, 220)); // semi-transparent dark background
+        g2.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+        g2.setColor(Color.white);
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+
+        g2.setFont(new Font("Arial", Font.PLAIN, 24));
+        int textY = boxY + 40;
+        g2.drawString("Controls:", boxX + 30, textY);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+        textY += 30;
+        g2.drawString("← → ↓ : Move block", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("↑ or : Rotate block", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("SPACE : Shoot arrow", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("WASD : Move character", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("Q/E : Aim bow", boxX + 30, textY);
+        textY += 30;
+        g2.drawString("ESC : Pause", boxX + 30, textY);
     }
 }

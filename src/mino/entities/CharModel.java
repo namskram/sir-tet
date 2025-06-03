@@ -22,11 +22,12 @@ public class CharModel {
     public BufferedImage left, right;
     public String dir;
     public int x, y;
-    private final float moveSpeed = Block.SIZE/2; // 8 -> 16
-    private final float jumpSpeed = Block.SIZE*2.5f; // 128 -> 64 -> 70
-    private float fallSpeed = Block.SIZE/4; // 4 -> 8
+    private final float moveSpeed = Block.SIZE/2;
+    private final float jumpSpeed = Block.SIZE*2.5f;
+    private float fallSpeed = Block.SIZE/4;
     private boolean inAir = false;
     private float above;
+
     public final List<Projectile> projectiles = new ArrayList<>(); // List of active projectiles
     private double aimAngle = 0; // Current aiming angle in degrees
     private int shootCooldown = 10; // Limit rate of fire to 10 frames
@@ -69,8 +70,8 @@ public class CharModel {
 
     public final void getCharModel() {
         try {
-            left = ImageIO.read(getClass().getResourceAsStream("/archer-left.png"));
-            right = ImageIO.read(getClass().getResourceAsStream("/archer-right.png"));
+            left = ImageIO.read(getClass().getResourceAsStream("/res/archer-left.png"));
+            right = ImageIO.read(getClass().getResourceAsStream("/res/archer-right.png"));
         } 
 
         catch (IOException e) {
@@ -120,12 +121,6 @@ public class CharModel {
                 b1.y = PlayManager.bottom_y - Block.SIZE; // Align character to the top of the floor
             }
         }
-
-        /*
-        if (!bottomCollision) {
-            b[0].y += fallSpeed;
-        }
-        */
     }
 
     private void checkMovingBlockCollision() {
@@ -245,7 +240,6 @@ public class CharModel {
         }
         else {
             fallSpeed = Block.SIZE/4;
-            //b[0].y = PlayManager.bottom_y - Block.SIZE;
         }
 
         // Update projectiles
@@ -261,12 +255,10 @@ public class CharModel {
 
         // Adjust aiming angle with Q and E
         if (KeyHandler.qPressed) {
-            aimAngle = Math.max(aimAngle - 4, -40); // Decrease angle, limit to -45 degrees
-            // KeyHandler.qPressed = false;
+            aimAngle = Math.max(aimAngle - 4, -40); // Decrease angle, limit to -40 degrees
         }
         if (KeyHandler.ePressed) {
-            aimAngle = Math.min(aimAngle + 4, 40); // Increase angle, limit to 45 degrees
-            // KeyHandler.ePressed = false;
+            aimAngle = Math.min(aimAngle + 4, 40); // Increase angle, limit to 40 degrees
         }
 
         // Increment the shoot timer
@@ -275,7 +267,7 @@ public class CharModel {
         }
 
         // Shoot a projectile when the spacebar is pressed
-        if (KeyHandler.spacePressed && shootTimer == 0) { // Use 'R' as an example key
+        if (KeyHandler.spacePressed && shootTimer == 0) {
             shootProjectile();
             shootTimer = shootCooldown;
             // KeyHandler.spacePressed = false; // Prevent continuous shooting
@@ -287,7 +279,7 @@ public class CharModel {
             // Check if the block overlaps with the player's x position
             if (block.x < b[0].x + Block.SIZE && block.x + Block.SIZE > b[0].x &&
                 block.y == b[0].y - Block.SIZE) {
-                // Only trigger game over if the player is on the ground
+                // Only trigger if player is on the ground when the block lands
                 if (bottomCollision) {
                     GamePanel.gameOver = true;
                     GamePanel.music.stop();
@@ -340,7 +332,7 @@ public class CharModel {
     }
 
     public void heal(int amount) {
-        health = Math.min(health + amount, 10); // 10 is max HP, adjust if needed
+        health = Math.min(health + amount, 10); // 10 is max HP for now
     }
 
     public void draw(Graphics2D g2) {
@@ -374,7 +366,7 @@ public class CharModel {
         }
 
         /*
-        // Draw the aiming arrow (using arrow-diag.png)
+        // Attempt to change the aiming indicator to a rotated arrow
         try {
             BufferedImage arrow = ImageIO.read(getClass().getResourceAsStream("/arrow.png"));
             int arrowWidth = Block.SIZE * 4; // Adjust the size of the arrow
