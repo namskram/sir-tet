@@ -45,7 +45,7 @@ public class PlayManager {
 
     int level = 1;
     int lines;
-    int score;
+    public int score;
 
     public static CharModel cm;
     public static int playerDamage = 1;
@@ -60,8 +60,6 @@ public class PlayManager {
     private boolean bossIncomingVisible = true;
     private int nextBossSpawnTime = 600; // Time in frames to wait before the next boss spawn
     private final Random random = new Random();
-    // private boolean fadingIn;
-    // private float bossMusicVolume = -80.0f;
 
     public PlayManager() {
         left_x = (GamePanel.WIDTH/2) - (WIDTH/2);
@@ -126,7 +124,6 @@ public class PlayManager {
                 GamePanel.bossMusic.setVolume(-20.0f); // Set the volume for the boss music
                 GamePanel.bossMusic.loop();
                 bossIncoming = false; // Hide "BOSS INCOMING" text
-                //fadingIn = true;
             }
         }
 
@@ -145,19 +142,6 @@ public class PlayManager {
                 }
             }
         }
-        /*
-
-        if (fadingIn) {
-            if (bossMusicVolume < 0.0f) {
-                bossMusicVolume += 2.0f; 
-                GamePanel.music.setVolume(bossMusicVolume);
-                System.out.println("Fading in: Volume = " + bossMusicVolume);
-            } else {
-                fadingIn = false; 
-                System.out.println("Fade-in complete: Volume = " + bossMusicVolume);
-            }
-        }
-        */
     
         if (bossSpawned && boss != null) {
             boss.update();
@@ -273,9 +257,9 @@ public class PlayManager {
         g2.drawRect(left_x - 4, top_y - 4, WIDTH + 8, HEIGHT + 8);
 
         // Draw the game over line
-        g2.setColor(Color.red); // Use red to make it stand out
-        g2.setStroke(new BasicStroke(2f)); // Thinner line for the game over line
-        g2.drawLine(left_x, top_y + (Block.SIZE*4), right_x, top_y + (Block.SIZE*4)); // Horizontal line at the top_y position
+        g2.setColor(Color.red);
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawLine(left_x, top_y + (Block.SIZE*4), right_x, top_y + (Block.SIZE*4));
 
         // Draw the "NEXT" box and other UI elements
         int x = right_x + 100;

@@ -21,12 +21,10 @@ public class KeyHandler extends KeyAdapter {
             if (pausePressed) {
                 pausePressed = false;
                 GamePanel.music.resume();
-                //GamePanel.music.play(0, true);
-                //GamePanel.music.loop();
-            } else {
+            }
+            else {
                 pausePressed = true;
                 GamePanel.music.pause();
-                //GamePanel.music.stop();
             }
         }
 
@@ -73,21 +71,6 @@ public class KeyHandler extends KeyAdapter {
     @Override
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
-
-        /* cant implement until frames lower
-        if (code == KeyEvent.VK_UP) {
-            upPressed = false;
-        }
-        if (code == KeyEvent.VK_LEFT) {
-            leftPressed = false;
-        }
-        if (code == KeyEvent.VK_DOWN) {
-            downPressed = false;
-        }
-        if (code == KeyEvent.VK_RIGHT) {
-            rightPressed = false;
-        }
-        */
 
         if (code == KeyEvent.VK_A) {
             aPressed = false;
