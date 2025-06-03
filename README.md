@@ -20,7 +20,7 @@ Every 20-30 seconds, a boss will spawn.
 
 Defeat the boss by hitting it with arrows while avoiding its fireball attacks. Each boss will spawn with additional health and damage. Clearing rows of tetris blocks will heal the character and increase bow damage.
 
-<img src="/res/heal.gif" alt="Heal" width="100"/>
+<img src="/res/heal.gif" alt="Heal" width="200"/>
 
 Try to get as many points as possible by clearing rows and defeating bosses!
 
